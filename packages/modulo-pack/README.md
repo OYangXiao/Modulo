@@ -17,22 +17,22 @@ pnpm install @strong-z/modulo-pack
 然后可以直接执行以下命令，也可以添加到package.json中作为script执行
 
 ```bash
-pnpx modulo-pack [ build | dev ] --target=[ page | lib ] --config=[ 配置文件路径 ]
+pnpx modulo-pack [ build | dev ] --config=[ 配置文件路径 ]
 ```
 
 ## 命令行参数解释：
 
 - build | dev：打包或者开发
-- target：目标，page表示构建页面，lib表示构建组件、函数
 - config：配置文件路径
 
 ## 配置文件：
 
 默认路径：./modulo.config.json
 
-配置项和默认值：{
+配置项和默认值：
 
 ```jsonc
+{
   "src_dir": "src", // 源码目录
   "dist_dir": "dist", // 输出目录
   "dir_names":{

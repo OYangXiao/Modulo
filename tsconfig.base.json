@@ -6,16 +6,11 @@
     "target": "ESNext",
     "strict": true,
     "allowJs": true,
-    "rootDir": "./src",
-    "outDir": "./dist",
     "module": "esnext",
     "moduleResolution": "bundler",
     "declaration": false,
     "declarationMap": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-  },
-  "include": [
-    "./src/**/*"
-  ]
+  }
 }
