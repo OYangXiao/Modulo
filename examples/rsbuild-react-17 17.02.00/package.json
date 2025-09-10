@@ -1,0 +1,26 @@
+{
+  "name": "rsbuild-react-17",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:page": "modulo-pack build --target=page",
+    "dev:page": "modulo-pack dev --target=page",
+    "build:lib": "modulo-pack build --target=lib",
+    "dev:lib": "modulo-pack dev --target=lib",
+    "build:all": "modulo-pack build --target=all",
+    "build": "pnpm run build:all"
+  },
+  "dependencies": {
+    "@types/jquery": "^3.5.32",
+    "jquery": "^3.7.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/react": "^17.0.84",
+    "@types/react-dom": "^17.0.26",
+    "typescript": "^5.8.2"
+  }
+}
