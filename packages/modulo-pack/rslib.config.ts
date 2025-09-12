@@ -1,22 +1,23 @@
 import { defineConfig } from '@rslib/core';
 
 export default defineConfig({
-  source: {
-    entry: {
-      index: './src/index.ts',
-    },
-  },
   lib: [
     {
+      dts: false,
       format: 'esm',
       syntax: 'esnext',
-      dts: false,
     },
   ],
   output: {
-    target: 'node',
     distPath: {
       root: './dist',
+    },
+    target: 'node',
+  },
+  source: {
+    entry: {
+      create_config: './src/cli/create-config-json.ts',
+      index: './src/index.ts',
     },
   },
 });

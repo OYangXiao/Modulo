@@ -1,7 +1,7 @@
-import { global_config, packagejson } from '../config';
-import { PANIC_IF } from './panic';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginVue2 } from '@rsbuild/plugin-vue2';
+import { global_config, packagejson } from '../config';
+import { PANIC_IF } from './panic';
 
 const { dependencies } = packagejson;
 

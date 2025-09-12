@@ -1,6 +1,9 @@
-import { lib_builder } from './builder/lib';
-import { page_builder } from './builder/page';
+import { args } from './args';
+import { pack } from './builder';
+import { create_config_file } from './cli/create-config-json';
 
-//先构建页面，防止产物目录被清理掉
-page_builder();
-lib_builder();
+if (args.cmd === 'create-config') {
+  create_config_file(args.name);
+} else if (args.cmd === 'pack') {
+  pack();
+}

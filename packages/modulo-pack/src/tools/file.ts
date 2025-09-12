@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import picocolors from 'picocolors';
 import { debug_log } from '../tools/debug-log';
 
 export function read_file(path: string, error_msg?: string) {
   try {
     return readFileSync(path, 'utf8');
   } catch {
-    console.log(error_msg || `文件无法访问或者不存在: ${path}`);
+    console.log(picocolors.red(error_msg || `文件无法访问或者不存在: ${path}`));
     return '';
   }
 }

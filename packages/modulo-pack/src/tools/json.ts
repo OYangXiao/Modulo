@@ -1,7 +1,11 @@
-export function jsonparse(input: string) {
+import picocolors from 'picocolors';
+
+export function jsonparse<T>(input: string) {
   try {
-    return JSON.parse(input);
+    if (input) {
+      return JSON.parse(input) as T;
+    }
   } catch (e) {
-    console.error(`JSON.parse failed\n${e}`);
+    console.error(picocolors.red(`JSON.parse failed\n${e}`));
   }
 }

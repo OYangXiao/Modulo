@@ -1,12 +1,11 @@
 import { exit } from 'node:process';
+import pc from 'picocolors';
 
-const alert = '\n! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !\n';
+const alert = '! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !';
 
-export function PANIC_IF(status = false, msg = `SOMETHING'S WRONG`, halt = false): asserts status is false {
+export function PANIC_IF(status = false, msg = `SOMETHING'S WRONG`, halt = true): asserts status is false {
   if (status) {
-    console.error(`${alert}${msg}${alert}`);
-    if (halt) {
-      exit(1);
-    }
+    console.log(pc.bgRed(pc.white(`\n${alert}\n\n${msg}\n\n${alert}`)), '\n');
+    halt && exit(1);
   }
 }
