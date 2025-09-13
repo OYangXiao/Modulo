@@ -1,56 +1,75 @@
 import minimist from "minimist";
 import { cwd, exit } from "node:process";
 import picocolors from "picocolors";
+import { appendFileSync, existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { pluginLess } from "@rsbuild/plugin-less";
 import { build, defineConfig } from "@rslib/core";
-import { appendFileSync, existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { pluginVue2 } from "@rsbuild/plugin-vue2";
 import { fileURLToPath } from "node:url";
 import { createRsbuild, defineConfig as core_defineConfig } from "@rsbuild/core";
+const default_dev_server_config = {
+    open: void 0,
+    port: 8080,
+    proxy: {}
+};
+const default_externals = {
+    jquery: 'jQuery',
+    react: 'React',
+    'react-dom': 'ReactDOM',
+    vue: 'Vue',
+    'vue-router': 'VueRouter'
+};
+const default_html_config = {
+    meta: {
+        viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover'
+    },
+    root: 'app',
+    tags: [
+        {
+            append: false,
+            attrs: {
+                src: '/common/js/webhost.js'
+            },
+            hash: false,
+            head: true,
+            publicPath: true,
+            tag: "script"
+        }
+    ],
+    template: '',
+    title: ''
+};
+const default_input_dirs = {
+    modules: 'modules',
+    pages: 'pages',
+    src: 'src'
+};
+const default_output_dirs = {
+    dist: 'dist',
+    modules: 'modules',
+    pages: ''
+};
+const default_ui_libs = {
+    react: '17.0.2',
+    vue: '2.7.16'
+};
+const default_url_config = {
+    base: './',
+    cdn: ''
+};
 const default_config = {
     analyze: false,
     define: {},
-    dev_server: {
-        open: void 0,
-        port: 8080,
-        proxy: {}
-    },
-    externals: {
-        jquery: 'jQuery',
-        react: 'React',
-        'react-dom': 'ReactDOM',
-        vue: 'Vue',
-        'vue-router': 'VueRouter'
-    },
-    html: {
-        meta: {
-            viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover'
-        },
-        root: 'app',
-        template: '',
-        title: ''
-    },
-    input: {
-        modules: 'modules',
-        pages: 'pages',
-        src: 'src'
-    },
+    dev_server: default_dev_server_config,
+    externals: default_externals,
+    html: default_html_config,
+    input: default_input_dirs,
     minify: void 0,
-    output: {
-        dist: 'dist',
-        modules: 'modules',
-        pages: ''
-    },
-    ui_lib: {
-        react: '17.0.2',
-        vue: '2.7.16'
-    },
-    url: {
-        base: '',
-        cdn: ''
-    }
+    output: default_output_dirs,
+    ui_lib: default_ui_libs,
+    url: default_url_config
 };
 const default_config_file_name = 'modulo.config.json';
 const panic_alert = '! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !';
@@ -106,20 +125,40 @@ const args = {
     config_file: args_argv.config || default_config_file_name,
     debug: 'true' === args_argv.debug,
     mode: 'build' === args_cmd || 'dev' === args_cmd ? get_mode(args_argv, args_cmd) : '',
-    name: args_argv.name
+    name: args_argv.name,
+    verbose: 'true' === args_argv.verbose
 };
 args.mode && set_node_env(args.mode);
-const debug_mode = args.debug;
-if (debug_mode) console.log('args: ', args);
+if (args.verbose) console.log('args: ', args);
+function create_config_file() {
+    const filename = args.name || default_config_file_name;
+    console.log(picocolors.blue('即将创建配置文件'), filename);
+    if (existsSync(filename)) return void console.log(picocolors.bgRed(picocolors.white('配置文件已存在')));
+    const filepath = resolve(process.cwd(), filename);
+    writeFileSync(filepath, JSON.stringify({
+        dev_server: default_config.dev_server,
+        html: {
+            title: 'Modulo Page'
+        },
+        input: {
+            modules: default_config.input.modules,
+            pages: default_config.input.pages
+        }
+    }, null, 2));
+    console.log(picocolors.green('创建成功'), filepath);
+}
 const logFile = join(process.cwd(), 'modulo.debug.log');
 let index = 0;
-function write_log(hint, ...params) {
-    if (debug_mode) {
+function debug_log(hint, ...params) {
+    if (args.debug || args.verbose) {
         const timestamp = new Date().toISOString();
         const sn = String(index++).padStart(3, '0');
-        const logEntry = `${sn} [${timestamp}] ${hint}\n${params.map((p)=>'object' == typeof p ? JSON.stringify(p, null, 2) : String(p)).join('\n')}\n---------------\n\n`;
-        console.log(picocolors.blue(`\ndebug log ${sn}`));
-        appendFileSync(logFile, logEntry);
+        const logEntry = `\n${sn} [${timestamp}] ${hint}\n${params.map((p)=>'object' == typeof p ? JSON.stringify(p, null, 2) : String(p)).join('\n')}\n---------------\n\n`;
+        if (args.verbose) console.log(logEntry);
+        if (args.debug) {
+            console.log(picocolors.blue(`\ndebug log ${sn}`));
+            appendFileSync(logFile, logEntry);
+        }
     }
 }
 function read_file(path, error_msg) {
@@ -132,7 +171,7 @@ function read_file(path, error_msg) {
 }
 function resolve_and_read(root, name) {
     const fullpath = resolve(root, name);
-    write_log(`resolve file: ${name}`, 'result is:', fullpath);
+    debug_log(`resolve file: ${name}`, 'result is:', fullpath);
     return read_file(fullpath);
 }
 function jsonparse(input) {
@@ -143,20 +182,24 @@ function jsonparse(input) {
     }
 }
 function merge_user_config(target, input, path = []) {
-    for(const key in input)if (key in target) {
-        path.push(key);
-        const error_msg = `${path.join('->')}处的类型与要求不一致, 请参考说明文档的默认配置`;
-        const from = input[key];
-        const to = target[key];
-        if (Array.isArray(to)) {
-            PANIC_IF(!Array.isArray(from), error_msg);
-            target[key] = [
-                ...to,
-                ...from
-            ];
-        } else {
-            PANIC_IF(typeof from !== typeof to, error_msg);
-            target[key] = 'object' == typeof to ? merge_user_config(from, to, path) : from;
+    for(const key in input){
+        console.log('input key', key);
+        if (key in target) {
+            path.push(key);
+            console.log('path', path);
+            const error_msg = `${path.join('->')}处的类型与要求不一致, 请参考说明文档的默认配置`;
+            const from = input[key];
+            const to = target[key];
+            if (Array.isArray(to)) {
+                PANIC_IF(!Array.isArray(from), error_msg);
+                target[key] = [
+                    ...to,
+                    ...from
+                ];
+            } else {
+                PANIC_IF(typeof from !== typeof to, error_msg);
+                target[key] = 'object' == typeof to ? merge_user_config(from, to, path) : from;
+            }
         }
     }
     return target;
@@ -164,14 +207,15 @@ function merge_user_config(target, input, path = []) {
 const config_root = cwd();
 const packagejson = jsonparse(resolve_and_read(config_root, 'package.json'));
 PANIC_IF(!packagejson, '根目录下没有package.json');
-write_log('package.json', packagejson);
+debug_log('package.json', packagejson);
 let config_global_config;
 function get_global_config() {
     if (config_global_config) return config_global_config;
     const user_config = jsonparse(resolve_and_read(config_root, args.config_file));
     PANIC_IF(!user_config, '根目录下没有配置文件');
-    write_log('input user config', user_config);
+    debug_log('input user config', user_config);
     const _config = merge_user_config(default_config, user_config);
+    debug_log('merged config', _config);
     const src = resolve(config_root, _config.input.src);
     const input = {
         modules: resolve(src, _config.input.modules),
@@ -195,7 +239,7 @@ function get_global_config() {
             ])),
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     };
-    write_log('当前模式', process.env.NODE_ENV);
+    debug_log('当前模式', process.env.NODE_ENV);
     const minify = 'boolean' == typeof _config.minify ? _config.minify : 'production' === process.env.NODE_ENV;
     config_global_config = {
         ..._config,
@@ -205,7 +249,7 @@ function get_global_config() {
         minify,
         output
     };
-    write_log('global config', config_global_config);
+    debug_log('global config', config_global_config);
     return config_global_config;
 }
 const { dependencies } = packagejson;
@@ -226,15 +270,15 @@ function collect_modules() {
     return Object.fromEntries(module_kinds.map((kind)=>{
         const module_path = global_config.input[kind];
         const exist = existsSync(module_path);
-        write_log('check module_path', module_path, exist ? 'exists' : 'NOT exists');
+        debug_log('check module_path', module_path, exist ? 'exists' : 'NOT exists');
         const module_entries = exist ? readdirSync(module_path, {
             withFileTypes: true
         }).filter((item)=>{
-            write_log('checking module is directory', item.name, item.isDirectory());
+            debug_log('checking module is directory', item.name, item.isDirectory());
             return item.isDirectory();
         }).map((dirent)=>{
             const dir_path = resolve(module_path, dirent.name);
-            write_log('checking module dir path', dir_path);
+            debug_log('checking module dir path', dir_path);
             const entry_file_path = [
                 resolve(dir_path, 'index.ts'),
                 resolve(dir_path, 'index.tsx'),
@@ -254,7 +298,7 @@ function collect_modules() {
                 resolve(dir_path, `${dirent.name}.js`),
                 resolve(dir_path, `${dirent.name}.jsx`)
             ].find((path)=>{
-                write_log('checking entry path', path);
+                debug_log('checking entry path', path);
                 return existsSync(path);
             });
             return [
@@ -268,11 +312,11 @@ function collect_modules() {
         ];
     }));
 }
-async function lib_builder(cmd) {
+async function lib_pack(cmd) {
     const global_config = get_global_config();
     const collected_modules = collect_modules();
-    console.log('\nmodule entries: ', collected_modules.modules, '\nmodule output minify: ', global_config.minify, '\nprocess.env.NODE_ENV', process.env.NODE_ENV);
-    if (!collected_modules.modules) return console.log('没有要构建的模块');
+    console.log(picocolors.blueBright('\n**** 开始构建 【module】 ****\n'), picocolors.blue('\nmodule entries: '), collected_modules.modules);
+    if (!collected_modules.modules) return console.log(picocolors.red('\n没有要构建的模块，跳过'));
     const umd_dist_dir = resolve(global_config.output.modules, 'umd');
     const rslibConfig = defineConfig({
         lib: [
@@ -344,12 +388,11 @@ async function lib_builder(cmd) {
 }
 const page_filename = fileURLToPath(import.meta.url);
 const page_dirname = dirname(page_filename);
-async function page_builder(cmd) {
+async function page_pack(cmd) {
     const global_config = get_global_config();
     const collected_modules = collect_modules();
-    console.log('\npage entries: ', collected_modules.pages);
-    console.log('\nbase path', global_config.url.base);
-    if (!collected_modules.pages) return console.log(picocolors.yellow('\n没有要构建的页面'));
+    console.log(picocolors.blueBright('\n**** 开始构建 【page】 ****'), picocolors.blue('\n\npage entries: '), collected_modules.pages, picocolors.blue('\nbase path'), global_config.url.base);
+    if (!collected_modules.pages) return console.log(picocolors.red('\n没有要构建的页面，跳过'));
     const rsbuildConfig = core_defineConfig({
         html: {
             meta: global_config.html.meta,
@@ -417,14 +460,9 @@ async function page_builder(cmd) {
     });
     await rsbuild['dev' === cmd ? 'startDevServer' : 'build']();
 }
-function build_build(cmd) {
-    page_builder(cmd);
-    lib_builder(cmd);
-}
-function create_config_file() {
-    const filename = args.name || default_config_file_name;
-    console.log('即将创建配置文件', filename);
-    writeFileSync(resolve(process.cwd(), filename), JSON.stringify(default_config, null, 2));
+async function pack_code(cmd) {
+    await page_pack(cmd);
+    await lib_pack(cmd);
 }
 if ('create-config' === args.cmd) create_config_file();
-else if ('build' === args.cmd || 'dev' === args.cmd) build_build(args.cmd);
+else if ('build' === args.cmd || 'dev' === args.cmd) pack_code(args.cmd);

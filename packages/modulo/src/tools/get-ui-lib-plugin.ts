@@ -1,7 +1,7 @@
 import { type PluginReactOptions, pluginReact } from '@rsbuild/plugin-react';
 import { type PluginVueOptions, pluginVue2 } from '@rsbuild/plugin-vue2';
-import { get_global_config, packagejson } from '../config';
-import { PANIC_IF } from './panic';
+import { get_global_config, packagejson } from '../config/index.ts';
+import { PANIC_IF } from './panic.ts';
 
 const { dependencies } = packagejson;
 

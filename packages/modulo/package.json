@@ -1,7 +1,7 @@
 {
   "author": "oyangxiao",
   "bin": {
-    "modulo": "./bin/modulo.js"
+    "modulo": "./bin/modulo.ts"
   },
   "dependencies": {
     "@rsbuild/core": "^1.5.6",

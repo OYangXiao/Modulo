@@ -1,25 +1,22 @@
 import { resolve } from 'node:path';
 import { pluginLess } from '@rsbuild/plugin-less';
 import { build, defineConfig } from '@rslib/core';
-import { get_global_config, packagejson } from '../config';
-import { collect_modules } from '../tools/collect-modules';
-import { framework_plugin } from '../tools/get-ui-lib-plugin';
+import picocolors from 'picocolors';
+import { get_global_config, packagejson } from '../config/index.ts';
+import { collect_modules } from '../tools/collect-modules.ts';
+import { framework_plugin } from '../tools/get-ui-lib-plugin.ts';
 
-export async function lib_builder(cmd: 'dev' | 'build') {
+export async function lib_pack(cmd: 'dev' | 'build') {
   const global_config = get_global_config();
-  const collected_modules = collect_modules();
 
-  console.log(
-    '\nmodule entries: ',
-    collected_modules.modules,
-    '\nmodule output minify: ',
-    global_config.minify,
-    '\nprocess.env.NODE_ENV',
-    process.env.NODE_ENV,
-  );
+  console.log(picocolors.blueBright('\n**** 开始构建 【module】 ****\n'));
 
-  if (!collected_modules.modules) {
-    return console.log('没有要构建的模块');
+  const module_entries = collect_modules('modules');
+
+  console.log(picocolors.blue('\nmodule entries: '), module_entries);
+
+  if (!module_entries) {
+    return console.log(picocolors.red('\n没有要构建的模块，跳过'));
   }
 
   // 支持导出umd和esm
@@ -100,7 +97,7 @@ export async function lib_builder(cmd: 'dev' | 'build') {
     },
     source: {
       define: global_config.define,
-      entry: collected_modules.modules,
+      entry: module_entries,
     },
   });
 

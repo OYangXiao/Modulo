@@ -1,41 +1,16 @@
 {
-  "analyze": false,
-  "define": {},
   "dev_server": {
     "port": 8080,
     "proxy": {}
   },
-  "externals": {
-    "jquery": "jQuery",
-    "react": "React",
-    "react-dom": "ReactDOM",
-    "vue": "Vue",
-    "vue-router": "VueRouter"
-  },
   "html": {
-    "meta": {
-      "viewport": "width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
-    },
-    "root": "app",
-    "template": "",
-    "title": ""
+    "title": "Modulo Page"
   },
   "input": {
     "modules": "modules",
-    "pages": "pages",
-    "src": "src"
+    "pages": "pages"
   },
   "output": {
-    "dist": "dist",
-    "modules": "modules",
-    "pages": ""
-  },
-  "ui_lib": {
-    "react": "17.0.2",
-    "vue": "2.7.16"
-  },
-  "url": {
-    "base": "",
-    "cdn": ""
+    "filenameHash": false
   }
 }

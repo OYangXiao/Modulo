@@ -1,12 +1,13 @@
 import { resolve } from 'node:path';
 import { cwd } from 'node:process';
-import { args } from '../args';
-import { resolve_and_read } from '../tools/file';
-import { jsonparse } from '../tools/json';
-import { PANIC_IF } from '../tools/panic';
-import { write_log } from '../tools/write-log';
-import { default_config, type USER_CONFIG } from './default';
-import { merge_user_config } from './merge-user-config';
+import { args } from '../args/index.ts';
+import { debug_log } from '../tools/debug-log.ts';
+import { resolve_and_read } from '../tools/file.ts';
+import { jsonparse } from '../tools/json.ts';
+import { PANIC_IF } from '../tools/panic.ts';
+import { default_config } from './default.ts';
+import { merge_user_config } from './merge-user-config.ts';
+import type { GLOBAL_CONFIG } from './type.ts';
 
 /**
  * 命令启动时候的目录作为根目录
@@ -17,25 +18,29 @@ export const root = cwd();
  * 读取package.json
  */
 // biome-ignore lint/style/noNonNullAssertion: <panic if content nullable>
-export const packagejson = jsonparse<PackageJson>(resolve_and_read(root, 'package.json'))!;
+export const packagejson = jsonparse<{
+  name: string;
+  dependencies: Record<string, string>;
+}>(resolve_and_read(root, 'package.json'))!;
 PANIC_IF(!packagejson, '根目录下没有package.json');
-write_log('package.json', packagejson);
+debug_log('package.json', packagejson);
 
-let global_config: USER_CONFIG;
+let global_config: GLOBAL_CONFIG;
 
 export function get_global_config() {
   if (global_config) return global_config;
   /**
    * 读取配置文件
    */
-  const user_config = jsonparse<USER_CONFIG>(resolve_and_read(root, args.config_file));
+  const user_config = jsonparse<GLOBAL_CONFIG>(resolve_and_read(root, args.config_file));
   PANIC_IF(!user_config, '根目录下没有配置文件');
-  write_log('input user config', user_config);
+  debug_log('input user config', user_config);
 
   /**
    * 将配置文件和默认配置合并
    */
-  const _config: USER_CONFIG = merge_user_config(default_config, user_config);
+  merge_user_config(default_config, user_config);
+  const _config: GLOBAL_CONFIG = default_config;
 
   /**
    * src目录
@@ -52,6 +57,7 @@ export function get_global_config() {
    */
   const dist = resolve(root, _config.output.dist);
   const output = {
+    ..._config.output,
     dist: dist,
     modules: resolve(dist, _config.output.modules),
     pages: resolve(dist, _config.output.pages),
@@ -73,7 +79,7 @@ export function get_global_config() {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
   };
 
-  write_log('当前模式', process.env.NODE_ENV);
+  debug_log('当前模式', process.env.NODE_ENV);
 
   /**
    * minify代码的开关
@@ -88,6 +94,6 @@ export function get_global_config() {
     minify,
     output,
   };
-  write_log('global config', global_config);
+  debug_log('global config', global_config);
   return global_config;
 }

@@ -1,8 +1,8 @@
 import minimist from 'minimist';
-import { default_config_file_name } from '../config/default';
-import { get_cmd } from './cmd';
-import { get_mode } from './mode';
-import { set_node_env } from './node_env';
+import { default_config_file_name } from '../config/default.ts';
+import { get_cmd } from './cmd.ts';
+import { get_mode } from './mode.ts';
+import { set_node_env } from './node_env.ts';
 
 const argv = minimist(process.argv.slice(2));
 
@@ -19,9 +19,10 @@ export const args = {
   mode: cmd === 'build' || cmd === 'dev' ? get_mode(argv, cmd) : ('' as ''),
   // 创建配置文件的文件名
   name: argv.name as string | undefined,
+  // verbose
+  verbose: argv.verbose === 'true',
 };
 
 args.mode && set_node_env(args.mode);
 
-export const debug_mode = args.debug;
-if (debug_mode) console.log('args: ', args);
+if (args.verbose) console.log('args: ', args);

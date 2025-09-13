@@ -1,6 +1,6 @@
 import type minimist from 'minimist';
 import picocolors from 'picocolors';
-import { PANIC_IF } from '../tools/panic';
+import { PANIC_IF } from '../tools/panic.ts';
 
 const mode_list = ['dev', 'development', 'prd', 'production'];
 

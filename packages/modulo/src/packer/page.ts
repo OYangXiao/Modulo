@@ -3,22 +3,29 @@ import { fileURLToPath } from 'node:url';
 import { createRsbuild, defineConfig } from '@rsbuild/core';
 import { pluginLess } from '@rsbuild/plugin-less';
 import picocolors from 'picocolors';
-import { get_global_config } from '../config';
-import { collect_modules } from '../tools/collect-modules';
-import { framework_plugin } from '../tools/get-ui-lib-plugin';
+import { get_global_config } from '../config/index.ts';
+import { collect_modules } from '../tools/collect-modules.ts';
+import { framework_plugin } from '../tools/get-ui-lib-plugin.ts';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = dirname(__filename); // get the name of the directory
 
-export async function page_builder(cmd: 'dev' | 'build') {
+export async function page_pack(cmd: 'dev' | 'build') {
   const global_config = get_global_config();
-  const collected_modules = collect_modules();
 
-  console.log('\npage entries: ', collected_modules.pages);
-  console.log('\nbase path', global_config.url.base);
+  console.log(picocolors.blueBright('\n**** 开始构建 【page】 ****'));
 
-  if (!collected_modules.pages) {
-    return console.log(picocolors.yellow('\n没有要构建的页面'));
+  const page_entries = collect_modules('pages');
+
+  console.log(
+    picocolors.blue('\n\npage entries: '),
+    page_entries,
+    picocolors.blue('\nbase path'),
+    global_config.url.base,
+  );
+
+  if (!page_entries) {
+    return console.log(picocolors.red('\n没有要构建的页面，跳过'));
   }
 
   const rsbuildConfig = defineConfig({
@@ -36,6 +43,7 @@ export async function page_builder(cmd: 'dev' | 'build') {
       distPath: {
         root: global_config.output.dist,
       },
+      filenameHash: global_config.output.filenameHash,
       legalComments: 'none',
       minify: global_config.minify && {
         js: true,
@@ -69,9 +77,11 @@ export async function page_builder(cmd: 'dev' | 'build') {
     },
     server: {
       base: global_config.url.base,
-      open: global_config.dev_server.open?.map(
-        (name: string) => global_config.url.base + (name.endsWith('html') ? `/${name}` : `/${name}.html`),
-      ),
+      open: global_config.dev_server.open
+        ? global_config.dev_server.open.map(
+            (name: string) => global_config.url.base + (name.endsWith('html') ? `/${name}` : `/${name}.html`),
+          )
+        : false,
       port: global_config.dev_server.port,
       proxy: global_config.dev_server.proxy,
     },
@@ -80,7 +90,7 @@ export async function page_builder(cmd: 'dev' | 'build') {
         'import.meta.env.MOUNT_ID': global_config.html.root,
         ...global_config.define,
       },
-      entry: collected_modules.pages,
+      entry: page_entries,
     },
   });
 

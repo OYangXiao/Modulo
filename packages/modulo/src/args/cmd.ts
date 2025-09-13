@@ -1,5 +1,5 @@
 import type minimist from 'minimist';
-import { PANIC_IF } from '../tools/panic';
+import { PANIC_IF } from '../tools/panic.ts';
 
 // 命令
 export function get_cmd(argv: minimist.ParsedArgs) {

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import picocolors from 'picocolors';
-import { write_log } from './write-log';
+import { debug_log } from './debug-log.ts';
 
 export function read_file(path: string, error_msg?: string) {
   try {
@@ -14,6 +14,6 @@ export function read_file(path: string, error_msg?: string) {
 
 export function resolve_and_read(root: string, name: string) {
   const fullpath = resolve(root, name);
-  write_log(`resolve file: ${name}`, 'result is:', fullpath);
+  debug_log(`resolve file: ${name}`, 'result is:', fullpath);
   return read_file(fullpath);
 }
