@@ -1,51 +1,48 @@
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { createRsbuild, defineConfig } from '@rsbuild/core';
 import { pluginLess } from '@rsbuild/plugin-less';
 import picocolors from 'picocolors';
 import { get_global_config } from '../config/index.ts';
 import { collect_modules } from '../tools/collect-modules.ts';
-import { framework_plugin } from '../tools/get-ui-lib-plugin.ts';
-
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
-const __dirname = dirname(__filename); // get the name of the directory
+import { get_package_root } from '../tools/find-path-root.ts';
+import { get_externals_and_tags } from '../tools/get-externals-and-tags.ts';
+import { framework_plugin } from '../tools/get-ui-plugin.ts';
 
 export async function page_pack(cmd: 'dev' | 'build') {
-  const global_config = get_global_config();
+  const config = get_global_config();
 
   console.log(picocolors.blueBright('\n**** 开始构建 【page】 ****'));
 
   const page_entries = collect_modules('pages');
 
-  console.log(
-    picocolors.blue('\n\npage entries: '),
-    page_entries,
-    picocolors.blue('\nbase path'),
-    global_config.url.base,
-  );
+  console.log(picocolors.blue('\n\npage entries: '), page_entries, picocolors.blue('\nbase path'), config.url.base);
 
   if (!page_entries) {
     return console.log(picocolors.red('\n没有要构建的页面，跳过'));
   }
 
+  const { externals, htmlTags } = get_externals_and_tags(config.externals);
+
   const rsbuildConfig = defineConfig({
     html: {
-      meta: global_config.html.meta,
-      mountId: global_config.html.root,
-      template: global_config.html.template || resolve(__dirname, '../template.html'),
+      meta: config.html.meta,
+      mountId: config.html.root,
+      tags: [...htmlTags, ...config.html.tags],
+      template: config.html.template || resolve(get_package_root(), 'template/index.html'),
       templateParameters: {
-        base_prefix: global_config.url.base,
+        base_prefix: config.url.base,
       },
-      title: global_config.html.title,
+      title: config.html.title,
     },
     output: {
-      assetPrefix: global_config.url.cdn || global_config.url.base,
+      assetPrefix: config.url.cdn || config.url.base,
       distPath: {
-        root: global_config.output.dist,
+        root: config.output.dist,
       },
-      filenameHash: global_config.output.filenameHash,
+      externals,
+      filenameHash: config.output.filenameHash,
       legalComments: 'none',
-      minify: global_config.minify && {
+      minify: config.minify && {
         js: true,
         jsOptions: {
           minimizerOptions: {
@@ -67,28 +64,27 @@ export async function page_pack(cmd: 'dev' | 'build') {
           },
         },
       },
-      // externals: lib_externals,
     },
     plugins: [framework_plugin(), pluginLess()],
     resolve: {
       alias: {
-        '@': global_config.input.src,
+        '@': config.input.src,
       },
     },
     server: {
-      base: global_config.url.base,
-      open: global_config.dev_server.open
-        ? global_config.dev_server.open.map(
-            (name: string) => global_config.url.base + (name.endsWith('html') ? `/${name}` : `/${name}.html`),
+      base: config.url.base,
+      open: config.dev_server.open
+        ? config.dev_server.open.map(
+            (name: string) => config.url.base + (name.endsWith('html') ? `/${name}` : `/${name}.html`),
           )
         : false,
-      port: global_config.dev_server.port,
-      proxy: global_config.dev_server.proxy,
+      port: config.dev_server.port,
+      proxy: config.dev_server.proxy,
     },
     source: {
       define: {
-        'import.meta.env.MOUNT_ID': global_config.html.root,
-        ...global_config.define,
+        'import.meta.env.MOUNT_ID': config.html.root,
+        ...config.define,
       },
       entry: page_entries,
     },
@@ -96,4 +92,8 @@ export async function page_pack(cmd: 'dev' | 'build') {
 
   const rsbuild = await createRsbuild({ rsbuildConfig });
   await rsbuild[cmd === 'dev' ? 'startDevServer' : 'build']();
+
+  if (cmd === 'build') {
+    console.log(picocolors.green('\n**** 构建【page】完成 ****'));
+  }
 }

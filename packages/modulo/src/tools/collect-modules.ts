@@ -3,10 +3,11 @@ import { resolve } from 'node:path';
 import picocolors from 'picocolors';
 import { get_global_config } from '../config/index.ts';
 import { debug_log } from './debug-log.ts';
-import { framework_name } from './get-ui-lib-plugin.ts';
+import { get_framework_name } from './get-ui-lib.ts';
 
 export function collect_modules(kind: 'pages' | 'modules') {
   const global_config = get_global_config();
+  const framework_name = get_framework_name();
   const module_path = global_config.input[kind];
   const exist = existsSync(module_path);
   debug_log(picocolors.blue('check module_path'), module_path, exist ? 'exists' : 'NOT exists');

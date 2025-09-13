@@ -1,19 +1,13 @@
 import { type PluginReactOptions, pluginReact } from '@rsbuild/plugin-react';
 import { type PluginVueOptions, pluginVue2 } from '@rsbuild/plugin-vue2';
-import { get_global_config, packagejson } from '../config/index.ts';
+import { get_global_config, get_packagejson } from '../config/index.ts';
+import { get_framework_name } from './get-ui-lib.ts';
 import { PANIC_IF } from './panic.ts';
 
-const { dependencies } = packagejson;
-
-PANIC_IF(
-  !('vue' in dependencies || 'react' in dependencies),
-  'package.json中未识别到支持的ui库信息, 当前只支持vue和react',
-);
-
-// 该项目是vue还是react项目
-export const framework_name = 'vue' in dependencies ? 'vue' : 'react';
-
 export function framework_plugin(options?: PluginVueOptions | PluginReactOptions) {
+  const { dependencies } = get_packagejson();
+  const framework_name = get_framework_name();
+
   // 必须使用指定版本号的ui库，以优化代码产出
   const version = dependencies[framework_name];
   const global_config = get_global_config();

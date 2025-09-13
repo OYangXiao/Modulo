@@ -1,30 +1,29 @@
 import { resolve } from 'node:path';
 import { pluginLess } from '@rsbuild/plugin-less';
 import { build, defineConfig } from '@rslib/core';
-import picocolors from 'picocolors';
-import { get_global_config, get_packagejson } from '../config/index.ts';
-import { collect_modules } from '../tools/collect-modules.ts';
-import { get_externals_and_tags } from '../tools/get-externals-and-tags.ts';
-import { framework_plugin } from '../tools/get-ui-plugin.ts';
+import { get_global_config, packagejson } from '../config';
+import { collect_modules } from '../tools/collect-modules';
+import { framework_plugin } from '../tools/get-ui-plugin';
 
-export async function lib_pack(cmd: 'dev' | 'build') {
-  const config = get_global_config();
-  const packagejson = get_packagejson();
+export async function lib_builder(cmd: 'dev' | 'build') {
+  const global_config = get_global_config();
+  const collected_modules = collect_modules();
 
-  console.log(picocolors.blueBright('\n**** 开始构建 【module】 ****\n'));
+  console.log(
+    '\nmodule entries: ',
+    collected_modules.modules,
+    '\nmodule output minify: ',
+    global_config.minify,
+    '\nprocess.env.NODE_ENV',
+    process.env.NODE_ENV,
+  );
 
-  const module_entries = collect_modules('modules');
-
-  console.log(picocolors.blue('\nmodule entries: '), module_entries);
-
-  if (!module_entries) {
-    return console.log(picocolors.red('\n没有要构建的模块，跳过'));
+  if (!collected_modules.modules) {
+    return console.log('没有要构建的模块');
   }
 
-  const { externals } = get_externals_and_tags(config.externals);
-
   // 支持导出umd和esm
-  const umd_dist_dir = resolve(config.output.modules, 'umd');
+  const umd_dist_dir = resolve(global_config.output.modules, 'umd');
   // const esm_dist_dir = resolve(dist_dir, `modules/${kind}/esm`);
 
   const rslibConfig = defineConfig({
@@ -43,12 +42,12 @@ export async function lib_pack(cmd: 'dev' | 'build') {
       {
         format: 'umd',
         output: {
-          assetPrefix: `${config.url.base}/modules/umd`,
+          assetPrefix: `${global_config.url.base}/modules/umd`,
           distPath: {
             root: umd_dist_dir,
           },
-          externals,
-          minify: config.minify && {
+          externals: global_config.externals,
+          minify: global_config.minify && {
             js: true,
             jsOptions: {
               minimizerOptions: {
@@ -83,7 +82,7 @@ export async function lib_pack(cmd: 'dev' | 'build') {
       // },
     },
     performance: {
-      bundleAnalyze: config.analyze
+      bundleAnalyze: global_config.analyze
         ? {
             analyzerMode: 'disabled',
             generateStatsFile: true,
@@ -96,18 +95,14 @@ export async function lib_pack(cmd: 'dev' | 'build') {
     plugins: [framework_plugin(), pluginLess()],
     resolve: {
       alias: {
-        '@': config.input.src,
+        '@': global_config.input.src,
       },
     },
     source: {
-      define: config.define,
-      entry: module_entries,
+      define: global_config.define,
+      entry: collected_modules.modules,
     },
   });
 
   await build(rslibConfig, { watch: cmd === 'dev' });
-
-  if (cmd === 'build') {
-    console.log(picocolors.green('\n**** 构建【module】完成 ****\n'));
-  }
 }
