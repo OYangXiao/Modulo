@@ -16,7 +16,6 @@ export default defineConfig({
   },
   source: {
     entry: {
-      create_config: './src/cli/create-config-json.ts',
       index: './src/index.ts',
     },
   },

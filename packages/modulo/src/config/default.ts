@@ -27,7 +27,7 @@ export const default_config = {
     pages: 'pages', // 页面目录
     src: 'src', // 源码目录
   },
-  minify: undefined, // 是否压缩产物，同时进行mangle
+  minify: undefined as boolean | undefined, // 是否压缩产物，同时进行mangle
   output: {
     dist: 'dist', // 源码目录
     modules: 'modules', // 组件输出目录，默认使用dist/modules/..
@@ -45,3 +45,5 @@ export const default_config = {
 };
 
 export type USER_CONFIG = typeof default_config;
+
+export const default_config_file_name = 'modulo.config.json';

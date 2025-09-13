@@ -6,7 +6,7 @@ import { debug_mode } from '../args';
 const logFile = path.join(process.cwd(), 'modulo.debug.log');
 let index = 0;
 
-export function debug_log(hint: string, ...params: any) {
+export function write_log(hint: string, ...params: any) {
   if (debug_mode) {
     const timestamp = new Date().toISOString();
     const sn = String(index++).padStart(3, '0');

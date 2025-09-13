@@ -12,6 +12,40 @@ importers:
         specifier: ^2.2.4
         version: 2.2.4
 
+  packages/modulo:
+    dependencies:
+      '@rsbuild/core':
+        specifier: ^1.5.6
+        version: 1.5.6
+      '@rsbuild/plugin-less':
+        specifier: ^1.5.0
+        version: 1.5.0(@rsbuild/core@1.5.6)
+      '@rsbuild/plugin-react':
+        specifier: ^1.4.0
+        version: 1.4.0(@rsbuild/core@1.5.6)
+      '@rsbuild/plugin-vue2':
+        specifier: ^1.0.4
+        version: 1.0.4(@rsbuild/core@1.5.6)(css-loader@7.1.2(@rspack/core@1.5.3(@swc/helpers@0.5.17))(webpack@5.101.3))
+      '@rslib/core':
+        specifier: 0.13.1
+        version: 0.13.1(typescript@5.9.2)
+      '@types/node':
+        specifier: ^22.18.0
+        version: 22.18.1
+      minimist:
+        specifier: ^1.2.8
+        version: 1.2.8
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+    devDependencies:
+      '@types/minimist':
+        specifier: ^1.2.5
+        version: 1.2.5
+
   packages/modulo-pack:
     dependencies:
       '@rsbuild/core':
@@ -49,8 +83,8 @@ importers:
   packages/react-17.0.2:
     dependencies:
       '@strong-z/modulo':
-        specifier: link:../modulo-pack
-        version: link:../modulo-pack
+        specifier: link:../modulo
+        version: link:../modulo
       react:
         specifier: 17.0.2
         version: 17.0.2

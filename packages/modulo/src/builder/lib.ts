@@ -1,12 +1,14 @@
-import { defineConfig, build } from '@rslib/core';
-import { pluginLess } from '@rsbuild/plugin-less';
 import { resolve } from 'node:path';
+import { pluginLess } from '@rsbuild/plugin-less';
+import { build, defineConfig } from '@rslib/core';
+import { get_global_config, packagejson } from '../config';
+import { collect_modules } from '../tools/collect-modules';
 import { framework_plugin } from '../tools/get-ui-lib-plugin';
-import { collected_modules } from '../tools/collect-modules';
-import { global_config, packagejson } from '../config';
-import { args } from '../args';
 
-export async function lib_builder() {
+export async function lib_builder(cmd: 'dev' | 'build') {
+  const global_config = get_global_config();
+  const collected_modules = collect_modules();
+
   console.log(
     '\nmodule entries: ',
     collected_modules.modules,
@@ -25,16 +27,6 @@ export async function lib_builder() {
   // const esm_dist_dir = resolve(dist_dir, `modules/${kind}/esm`);
 
   const rslibConfig = defineConfig({
-    plugins: [framework_plugin(), pluginLess()],
-    resolve: {
-      alias: {
-        '@': global_config.input.src,
-      },
-    },
-    source: {
-      entry: collected_modules.modules,
-      define: global_config.define,
-    },
     lib: [
       // {
       //   format: 'esm',
@@ -49,42 +41,42 @@ export async function lib_builder() {
       // },
       {
         format: 'umd',
-        umdName: `${packagejson.name}-modules-[name]`,
-        syntax: 'es6',
         output: {
-          externals: global_config.externals,
+          assetPrefix: `${global_config.url.base}/modules/umd`,
           distPath: {
             root: umd_dist_dir,
           },
-          assetPrefix: `${global_config.url.base}/modules/umd`,
+          externals: global_config.externals,
           minify: global_config.minify && {
             js: true,
             jsOptions: {
               minimizerOptions: {
-                mangle: true,
-                minify: true,
                 compress: {
-                  defaults: false,
-                  unused: true,
                   dead_code: true,
+                  defaults: false,
                   toplevel: true,
+                  unused: true,
                 },
                 format: {
                   comments: 'some',
+                  ecma: 2015,
                   preserve_annotations: true,
                   safari10: true,
                   semicolons: false,
-                  ecma: 2015,
                 },
+                mangle: true,
+                minify: true,
               },
             },
           },
         },
+        syntax: 'es6',
+        umdName: `${packagejson.name}-modules-[name]`,
       },
     ],
     output: {
-      target: 'web',
       legalComments: 'none',
+      target: 'web',
       // cssModules: {
       //   exportGlobals: true,
       // },
@@ -100,7 +92,17 @@ export async function lib_builder() {
         strategy: 'all-in-one',
       },
     },
+    plugins: [framework_plugin(), pluginLess()],
+    resolve: {
+      alias: {
+        '@': global_config.input.src,
+      },
+    },
+    source: {
+      define: global_config.define,
+      entry: collected_modules.modules,
+    },
   });
 
-  await build(rslibConfig, { watch: args.cmd === 'dev' });
+  await build(rslibConfig, { watch: cmd === 'dev' });
 }
