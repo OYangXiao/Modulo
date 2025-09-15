@@ -1,5 +1,5 @@
 import minimist from 'minimist';
-import { default_config_file_name } from '../config/default.ts';
+import { default_config_file_name } from '../config/preset/index.ts';
 import { PANIC_IF } from '../tools/panic.ts';
 import { get_cmd } from './cmd.ts';
 import { get_mode } from './mode.ts';

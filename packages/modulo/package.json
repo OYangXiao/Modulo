@@ -20,7 +20,7 @@
   },
   "license": "ISC",
   "main": "./src/index.ts",
-  "name": "@strong-z/modulo",
+  "name": "@yannick-z/modulo",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

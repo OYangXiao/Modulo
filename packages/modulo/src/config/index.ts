@@ -1,13 +1,13 @@
-import { resolve } from 'node:path';
-import { cwd } from 'node:process';
-import { get_args } from '../args/index.ts';
-import { debug_log } from '../tools/debug-log.ts';
-import { resolve_and_read } from '../tools/file.ts';
-import { jsonparse } from '../tools/json.ts';
-import { PANIC_IF } from '../tools/panic.ts';
-import { default_config } from './default.ts';
-import { merge_user_config } from './merge-user-config.ts';
-import type { GLOBAL_CONFIG } from './type.ts';
+import { resolve } from "node:path";
+import { cwd } from "node:process";
+import { get_args } from "../args/index.ts";
+import { debug_log } from "../tools/debug-log.ts";
+import { resolve_and_read } from "../tools/file.ts";
+import { jsonparse } from "../tools/json.ts";
+import { merge_user_config } from "../tools/merge-user-config.ts";
+import { PANIC_IF } from "../tools/panic.ts";
+import { preset_config } from "./preset/index.ts";
+import type { GLOBAL_CONFIG } from "./type.ts";
 
 /**
  * 命令启动时候的目录作为根目录
@@ -25,10 +25,12 @@ let packagejson = null as PackageJson | null;
 export function get_packagejson() {
   if (!packagejson) {
     // biome-ignore lint/style/noNonNullAssertion: <panic if content nullable>
-    packagejson = jsonparse<PackageJson>(resolve_and_read(root, 'package.json'))!;
-    PANIC_IF(!packagejson, '根目录下没有package.json');
-    PANIC_IF(!packagejson.name, 'package.json缺少name字段');
-    debug_log('package.json', packagejson);
+    packagejson = jsonparse<PackageJson>(
+      resolve_and_read(root, "package.json")
+    )!;
+    PANIC_IF(!packagejson, "根目录下没有package.json");
+    PANIC_IF(!packagejson.name, "package.json缺少name字段");
+    debug_log("package.json", packagejson);
   }
   return packagejson;
 }
@@ -41,15 +43,17 @@ export function get_global_config() {
     /**
      * 读取配置文件
      */
-    const user_config = jsonparse<GLOBAL_CONFIG>(resolve_and_read(root, args.config_file));
-    PANIC_IF(!user_config, '根目录下没有配置文件');
-    debug_log('input user config', user_config);
+    const user_config = jsonparse<GLOBAL_CONFIG>(
+      resolve_and_read(root, args.config_file)
+    );
+    PANIC_IF(!user_config, "根目录下没有配置文件");
+    debug_log("input user config", user_config);
 
     /**
      * 将配置文件和默认配置合并
      */
-    merge_user_config(default_config, user_config);
-    const _config: GLOBAL_CONFIG = default_config;
+    merge_user_config(preset_config, user_config);
+    const _config: GLOBAL_CONFIG = preset_config;
 
     /**
      * src目录
@@ -84,16 +88,21 @@ export function get_global_config() {
      */
 
     const define = {
-      ...Object.fromEntries(Object.entries(_config.define).map(([k, v]) => [k, JSON.stringify(v)])),
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      ...Object.fromEntries(
+        Object.entries(_config.define).map(([k, v]) => [k, JSON.stringify(v)])
+      ),
+      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     };
 
-    debug_log('当前模式', process.env.NODE_ENV);
+    debug_log("当前模式", process.env.NODE_ENV);
 
     /**
      * minify代码的开关
      */
-    const minify = typeof _config.minify === 'boolean' ? _config.minify : process.env.NODE_ENV === 'production';
+    const minify =
+      typeof _config.minify === "boolean"
+        ? _config.minify
+        : process.env.NODE_ENV === "production";
 
     global_config = {
       ..._config,
@@ -103,7 +112,7 @@ export function get_global_config() {
       minify,
       output,
     };
-    debug_log('global config', global_config);
+    debug_log("global config", global_config);
   }
   return global_config;
 }

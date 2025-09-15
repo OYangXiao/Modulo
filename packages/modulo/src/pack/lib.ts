@@ -4,21 +4,22 @@ import { build, defineConfig } from '@rslib/core';
 import { get_global_config, packagejson } from '../config';
 import { collect_modules } from '../tools/collect-modules';
 import { framework_plugin } from '../tools/get-ui-plugin';
+import { minify_config } from './minify-config.ts';
 
 export async function lib_builder(cmd: 'dev' | 'build') {
   const global_config = get_global_config();
-  const collected_modules = collect_modules();
+  const collected_modules = collect_modules('modules');
 
   console.log(
     '\nmodule entries: ',
-    collected_modules.modules,
+    collected_modules,
     '\nmodule output minify: ',
     global_config.minify,
     '\nprocess.env.NODE_ENV',
     process.env.NODE_ENV,
   );
 
-  if (!collected_modules.modules) {
+  if (!collected_modules) {
     return console.log('没有要构建的模块');
   }
 
@@ -47,28 +48,7 @@ export async function lib_builder(cmd: 'dev' | 'build') {
             root: umd_dist_dir,
           },
           externals: global_config.externals,
-          minify: global_config.minify && {
-            js: true,
-            jsOptions: {
-              minimizerOptions: {
-                compress: {
-                  dead_code: true,
-                  defaults: false,
-                  toplevel: true,
-                  unused: true,
-                },
-                format: {
-                  comments: 'some',
-                  ecma: 2015,
-                  preserve_annotations: true,
-                  safari10: true,
-                  semicolons: false,
-                },
-                mangle: true,
-                minify: true,
-              },
-            },
-          },
+          minify: global_config.minify && minify_config,
         },
         syntax: 'es6',
         umdName: `${packagejson.name}-modules-[name]`,
@@ -100,7 +80,7 @@ export async function lib_builder(cmd: 'dev' | 'build') {
     },
     source: {
       define: global_config.define,
-      entry: collected_modules.modules,
+      entry: collected_modules,
     },
   });
 

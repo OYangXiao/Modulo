@@ -9,10 +9,8 @@ export interface Tag {
 }
 
 export const default_html_config = {
-  meta: {
-    viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover',
-  } as Record<string, string>,
-  root: 'app', // html挂载点id, 只允许id
+  meta: {} as Record<string, string>,
+  root: '', // html挂载点id, 只允许id
   tags: [] as Tag[],
   template: '', // html模板的路径
   title: '', // html标题

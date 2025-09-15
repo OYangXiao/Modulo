@@ -3,9 +3,8 @@
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on",
-        "useSortedKeys": "on",
-        "useSortedProperties": "on"
+        "recommended": true,
+        "organizeImports":"on"
       }
     }
   },

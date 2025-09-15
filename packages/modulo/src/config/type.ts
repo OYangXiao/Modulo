@@ -1,6 +1,6 @@
-import type { default_config } from './default.ts';
+import type { preset_config } from './preset/index.ts';
 
-export type GLOBAL_CONFIG = typeof default_config;
+export type GLOBAL_CONFIG = typeof preset_config;
 
 export interface USER_CONFIG {
   analyze?: boolean;
