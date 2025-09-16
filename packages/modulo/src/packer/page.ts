@@ -16,7 +16,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
 
   console.log(picocolors.blueBright("\n**** 开始构建 【page】 ****"));
 
-  const page_entries = collect_modules("pages");
+  const page_entries = collect_modules(args, "pages");
 
   console.log(picocolors.blue("\nbase path"), config.url.base);
 
@@ -64,17 +64,20 @@ export async function page_pack(args: ModuloArgs_Pack) {
       meta: config.html.meta,
       mountId: config.html.root,
       scriptLoading: args.pack.esm ? "module" : "defer",
-      tags: args.pack.esm
-        ? [
-            {
-              append: false,
-              head: true,
-              tag: "script",
-              attrs: { type: "importmap" },
-              children: externals_to_importmap(args, config.externals),
-            },
-          ]
-        : htmlTags,
+      tags: [
+        ...config.html.tags,
+        ...(args.pack.esm
+          ? [
+              {
+                append: false,
+                head: true,
+                tag: "script",
+                attrs: { type: "importmap" },
+                children: externals_to_importmap(args, config.externals),
+              },
+            ]
+          : htmlTags),
+      ],
       template:
         config.html.template ||
         resolve(get_package_root(), "template/index.html"),

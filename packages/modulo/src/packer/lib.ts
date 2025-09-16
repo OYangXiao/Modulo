@@ -15,7 +15,7 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 
   console.log(picocolors.blueBright("\n**** 开始构建 【module】 ****\n"));
 
-  const module_entries = collect_modules("modules");
+  const module_entries = collect_modules(args, "modules");
 
   if (!module_entries) {
     return console.log(picocolors.red("\n没有要构建的模块，跳过\n"));

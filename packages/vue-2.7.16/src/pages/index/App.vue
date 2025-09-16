@@ -4,6 +4,13 @@
     <p>Start building amazing things with Rsbuild.</p>
   </div>
 </template>
+<script lang="ts">
+export default {
+  mounted(){
+    
+  }
+}
+</script>
 
 <style scoped>
 .content {

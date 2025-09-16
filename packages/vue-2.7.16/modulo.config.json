@@ -1,0 +1,62 @@
+{
+  "input": {
+    "src": "src",
+    "pages": "pages",
+    "modules": "modules"
+  },
+  "output": {
+    "filenameHash": true
+  },
+  "url": {
+    "base": "/packages/vue-2.7.16/dist"
+  },
+  "alias": {
+    "@": "{input.src}"
+  },
+  "html": {
+    "title": "Modulo Page",
+    "meta": {
+      "viewport": "width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
+    },
+    "root": "app",
+    "tags": [
+      {
+        "tag": "script",
+        "attrs": {
+          "src": "/packages/webhost/dist/webhost.iife.js"
+        },
+        "head": true,
+        "append": false,
+        "publicPath": false
+      }
+    ]
+  },
+  "externals": [
+    {
+      "global": "Vue",
+      "importName": [
+        "vue",
+        "Vue"
+      ],
+      "name": "vue",
+      "preset": "vue",
+      "publicPath": false,
+      "url": "https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.min.js"
+    },
+    {
+      "global": "jQuery",
+      "importName": [
+        "jquery",
+        "jQuery"
+      ],
+      "name": "jQuery",
+      "publicPath": false,
+      "url": "https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
+    }
+  ],
+  "dev_server": {
+    "open": false,
+    "port": 8080,
+    "proxy": {}
+  }
+}

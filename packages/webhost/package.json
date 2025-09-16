@@ -1,0 +1,21 @@
+{
+  "name": "@yannick-z/modulo-webhost",
+  "description": "",
+  "type": "module",
+  "version": "0.2.0",
+  "main": "./src/index.ts",
+  "author": "oyangxiao",
+  "scripts": {
+    "build": "rslib build",
+    "dev": "rslib build -w"
+  },
+  "dependencies": {
+    "@rslib/core": "0.13.1",
+    "@types/node": "^22.18.0",
+    "typescript": "^5.9.2"
+  },
+  "license": "ISC",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}

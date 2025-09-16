@@ -73,9 +73,9 @@ importers:
 
   packages/vue-2.7.16:
     dependencies:
-      '@strong-z/modulo':
-        specifier: link:../modulo-pack
-        version: link:../modulo-pack
+      '@yannick-z/modulo':
+        specifier: link:../modulo
+        version: link:../modulo
       vue:
         specifier: 2.7.16
         version: 2.7.16
@@ -83,6 +83,18 @@ importers:
       '@biomejs/biome':
         specifier: ^2.2.3
         version: 2.2.3
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
+  packages/webhost:
+    dependencies:
+      '@rslib/core':
+        specifier: 0.13.1
+        version: 0.13.1(typescript@5.9.2)
+      '@types/node':
+        specifier: ^22.18.0
+        version: 22.18.1
       typescript:
         specifier: ^5.9.2
         version: 5.9.2

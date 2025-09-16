@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@strong-z/modulo": "link:../modulo-pack",
+    "@yannick-z/modulo": "link:../modulo",
     "vue": "2.7.16"
   },
   "devDependencies": {
@@ -9,13 +9,7 @@
   },
   "name": "vue-2.7.16",
   "private": true,
-  "scripts": {
-    "build": "rsbuild build",
-    "check": "biome check --write",
-    "dev": "rsbuild dev --open",
-    "format": "biome format --write",
-    "preview": "rsbuild preview"
-  },
+  "scripts": {},
   "type": "module",
   "version": "1.0.0"
 }

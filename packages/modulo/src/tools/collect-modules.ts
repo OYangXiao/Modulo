@@ -4,9 +4,13 @@ import picocolors from "picocolors";
 import { get_global_config } from "../config/index.ts";
 import { debug_log } from "./debug-log.ts";
 import { get_framework_name } from "./get-framework-name.ts";
+import type { ModuloArgs_Pack } from "../args/index.ts";
 
-export function collect_modules(kind: "pages" | "modules") {
-  const global_config = get_global_config();
+export function collect_modules(
+  args: ModuloArgs_Pack,
+  kind: "pages" | "modules"
+) {
+  const global_config = get_global_config(args);
   const framework_name = get_framework_name();
   const module_path = global_config.input[kind];
   const exist = existsSync(module_path);
