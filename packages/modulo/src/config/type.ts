@@ -12,4 +12,6 @@ export interface USER_CONFIG {
   minify?: Partial<GLOBAL_CONFIG["minify"]> | boolean;
   output?: Partial<GLOBAL_CONFIG["output"]>;
   ui_lib?: Partial<GLOBAL_CONFIG["ui_lib"]>;
+  alias?: GLOBAL_CONFIG["alias"];
+  url?: Partial<GLOBAL_CONFIG["url"]>;
 }

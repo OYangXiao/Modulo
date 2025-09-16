@@ -4,7 +4,7 @@
     "actions": {
       "source": {
         "recommended": true,
-        "organizeImports":"on"
+        "organizeImports": "on"
       }
     }
   },
@@ -14,7 +14,9 @@
     }
   },
   "files": {
-    "includes": ["packages/*/src/**/*.{ts,tsx,js,jsx}", "packages/*/src/**/*.css", "packages/*/*.{json,ts}"]
+    "includes": [
+      "packages/{module, react-17.0.2, vue-2.7.16}/src/**/*.{ts,tsx,js,jsx,css,json}"
+    ]
   },
   "formatter": {
     "formatWithErrors": true,

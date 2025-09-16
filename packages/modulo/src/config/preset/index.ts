@@ -1,5 +1,6 @@
 import type { OutputConfig } from "@rsbuild/core";
 import type { LibExternal } from "../example/example-externals.ts";
+import { preset_alias } from "./alias.ts";
 import { preset_dev_server_config } from "./dev-server.ts";
 import { preset_input_dirs, preset_output_dirs } from "./dirs.ts";
 import { default_html_config } from "./html.ts";
@@ -18,5 +19,5 @@ export const preset_config = {
   output: preset_output_dirs,
   ui_lib: preset_ui_libs,
   url: preset_url_config,
-  alias: {} as Record<string, string>,
+  alias: preset_alias,
 };

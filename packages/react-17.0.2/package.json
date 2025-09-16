@@ -4,8 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "modulo build",
-    "dev": "modulo dev"
+    "build": "modulo build all",
+    "dev": "modulo dev",
+    "build:page": "modulo build page",
+    "build:module": "modulo build module",
+    "build:all": "modulo build all",
+    "dev:page": "modulo dev page",
+    "dev:module": "modulo dev module",
+    "watch:page": "modulo build page --watch=true",
+    "watch:module": "modulo build module --watch=true"
   },
   "dependencies": {
     "@yannick-z/modulo": "link:../modulo",
