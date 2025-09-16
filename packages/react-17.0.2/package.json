@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "modulo-pack build",
-    "dev": "modulo-pack dev"
+    "build": "modulo build",
+    "dev": "modulo dev"
   },
   "dependencies": {
     "@yannick-z/modulo": "link:../modulo",

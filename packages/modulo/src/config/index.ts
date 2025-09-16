@@ -7,7 +7,8 @@ import { jsonparse } from "../tools/json.ts";
 import { merge_user_config } from "../tools/merge-user-config.ts";
 import { PANIC_IF } from "../tools/panic.ts";
 import { preset_config } from "./preset/index.ts";
-import type { GLOBAL_CONFIG } from "./type.ts";
+import { preset_minify_config } from "./preset/minify.ts";
+import type { GLOBAL_CONFIG, USER_CONFIG } from "./type.ts";
 
 /**
  * 命令启动时候的目录作为根目录
@@ -43,9 +44,11 @@ export function get_global_config() {
     /**
      * 读取配置文件
      */
-    const user_config = jsonparse<GLOBAL_CONFIG>(
+
+    // biome-ignore lint/style/noNonNullAssertion: <有panic保护>
+    const user_config = jsonparse<USER_CONFIG>(
       resolve_and_read(root, args.config_file)
-    );
+    )!;
     PANIC_IF(!user_config, "根目录下没有配置文件");
     debug_log("input user config", user_config);
 
@@ -100,9 +103,7 @@ export function get_global_config() {
      * minify代码的开关
      */
     const minify =
-      typeof _config.minify === "boolean"
-        ? _config.minify
-        : process.env.NODE_ENV === "production";
+      user_config.minify === true ? preset_minify_config : user_config.minify;
 
     global_config = {
       ..._config,

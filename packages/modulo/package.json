@@ -1,5 +1,14 @@
 {
+  "name": "@yannick-z/modulo",
+  "description": "",
+  "type": "module",
+  "version": "0.2.0",
+  "main": "./src/index.ts",
   "author": "oyangxiao",
+  "scripts": {
+    "build": "rslib build",
+    "dev": "rslib build -w"
+  },
   "bin": {
     "modulo": "./bin/modulo.js"
   },
@@ -14,20 +23,11 @@
     "picocolors": "^1.1.1",
     "typescript": "^5.9.2"
   },
-  "description": "",
   "devDependencies": {
     "@types/minimist": "^1.2.5"
   },
   "license": "ISC",
-  "main": "./src/index.ts",
-  "name": "@yannick-z/modulo",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
-  },
-  "scripts": {
-    "build": "rslib build",
-    "dev": "rslib build -w"
-  },
-  "type": "module",
-  "version": "0.2.0"
+  }
 }

@@ -1,4 +1,6 @@
-export const minify_config = {
+import type { OutputConfig } from "@rsbuild/core";
+
+export const preset_minify_config: OutputConfig["minify"] = {
   js: true,
   jsOptions: {
     minimizerOptions: {
@@ -19,4 +21,4 @@ export const minify_config = {
       minify: true,
     },
   },
-} as const;
+};
