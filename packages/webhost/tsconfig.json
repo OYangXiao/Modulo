@@ -4,8 +4,12 @@
     "allowJs": true,
     "noEmit": true,
     "outDir": "./dist",
-    "rootDir": "./"
+    "rootDir": "./",
   },
   "extends": "../../tsconfig.base.json",
-  "include": ["./src/**/*", "./rslib.config.ts", "./types/*"]
+  "include": [
+    "./src/**/*",
+    "./rslib.config.ts",
+    "./types/*"
+  ]
 }

@@ -2,26 +2,28 @@ import { defineConfig } from "@rslib/core";
 
 export default defineConfig({
   lib: [
-    {
-      dts: false,
-      format: "esm",
-      syntax: "esnext",
-      output: {
-        filename: {
-          js: "webhost.[name].js",
-        },
-      },
-    },
     // {
     //   dts: false,
-    //   format: "iife",
+    //   format: "esm",
     //   syntax: "esnext",
     //   output: {
     //     filename: {
     //       js: "webhost.[name].js",
     //     },
+    //     minify: true,
     //   },
     // },
+    {
+      dts: false,
+      format: "iife",
+      syntax: "esnext",
+      output: {
+        filename: {
+          js: "webhost.[name].js",
+        },
+        minify: true,
+      },
+    },
   ],
   output: {
     distPath: {
@@ -31,8 +33,8 @@ export default defineConfig({
   },
   source: {
     entry: {
-      esm: "./src/esm.ts",
-      iife: "./src/iife.ts",
+      module: "./src/module.ts",
+      system: "./src/system.ts",
     },
   },
 });

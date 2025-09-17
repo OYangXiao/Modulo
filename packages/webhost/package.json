@@ -12,6 +12,7 @@
   "dependencies": {
     "@rslib/core": "0.13.1",
     "@types/node": "^22.18.0",
+    "systemjs": "^6.15.1",
     "typescript": "^5.9.2"
   },
   "license": "ISC",

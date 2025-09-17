@@ -10,6 +10,7 @@ import { get_externals_and_tags } from "../tools/get-externals-and-tags.ts";
 import { framework_plugin } from "../tools/get-ui-plugin.ts";
 import { omit_root_path_for_entries } from "../tools/omit-root-path.ts";
 import { externals_to_importmap } from "../tools/externals-to-importmap.ts";
+import { pluginUmd } from "@rsbuild/plugin-umd";
 
 export async function page_pack(args: ModuloArgs_Pack) {
   const config = get_global_config(args);
@@ -32,9 +33,30 @@ export async function page_pack(args: ModuloArgs_Pack) {
     );
   }
 
-  const { externals, htmlTags } = get_externals_and_tags(
-    args,
-    config.externals
+  const externals = get_externals_and_tags(args, config.externals);
+
+  console.log(
+    `${picocolors.blue("\nexternals:")}\n${JSON.stringify(
+      externals,
+      null,
+      2
+    )}\n`
+  );
+
+  const importmaps_tag = {
+    append: false,
+    head: true,
+    tag: "script",
+    attrs: { type: args.pack.esm ? "importmap" : "systemjs-importmap" },
+    children: externals_to_importmap(args, config.externals),
+  };
+
+  console.log(
+    `${picocolors.blue("\nimportmaps:")}\n${JSON.stringify(
+      JSON.parse(importmaps_tag.children),
+      null,
+      2
+    )}\n`
   );
 
   const rsbuildConfig = defineConfig({
@@ -42,13 +64,20 @@ export async function page_pack(args: ModuloArgs_Pack) {
       define: config.define,
       entry: page_entries,
     },
-    plugins: [framework_plugin(), pluginLess()],
+    plugins: [
+      framework_plugin(),
+      pluginLess(),
+      pluginUmd({
+        name: "modulo-page",
+      }),
+    ],
     tools: {
       rspack: {
         experiments: {
           outputModule: args.pack.esm,
         },
       },
+      htmlPlugin: true,
     },
     output: {
       assetPrefix: config.url.cdn || config.url.base,
@@ -64,20 +93,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
       meta: config.html.meta,
       mountId: config.html.root,
       scriptLoading: args.pack.esm ? "module" : "defer",
-      tags: [
-        ...config.html.tags,
-        ...(args.pack.esm
-          ? [
-              {
-                append: false,
-                head: true,
-                tag: "script",
-                attrs: { type: "importmap" },
-                children: externals_to_importmap(args, config.externals),
-              },
-            ]
-          : htmlTags),
-      ],
+      tags: [importmaps_tag, ...config.html.tags],
       template:
         config.html.template ||
         resolve(get_package_root(), "template/index.html"),

@@ -23,6 +23,9 @@ importers:
       '@rsbuild/plugin-react':
         specifier: ^1.4.0
         version: 1.4.0(@rsbuild/core@1.5.6)
+      '@rsbuild/plugin-umd':
+        specifier: ^1.0.5
+        version: 1.0.5(@rsbuild/core@1.5.6)
       '@rsbuild/plugin-vue2':
         specifier: ^1.0.4
         version: 1.0.4(@rsbuild/core@1.5.6)(css-loader@7.1.2(@rspack/core@1.5.3(@swc/helpers@0.5.17))(webpack@5.101.3))
@@ -95,6 +98,9 @@ importers:
       '@types/node':
         specifier: ^22.18.0
         version: 22.18.1
+      systemjs:
+        specifier: ^6.15.1
+        version: 6.15.1
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -342,6 +348,14 @@ packages:
     resolution: {integrity: sha512-YhhOUOonJBjnKpUf7E4iXKidldPWAGmYBRtDjQgcSmW4tbW0DasFpNCqLn5870Q2Ly6oCU06sLv+8G597I36+w==}
     peerDependencies:
       '@rsbuild/core': 1.x
+
+  '@rsbuild/plugin-umd@1.0.5':
+    resolution: {integrity: sha512-FHA7fRUcGOFj9TKFSYU/I+BA1RAExRy7g+O4G1VanUy5eTtmmi7xISamd3Rg54h95ohFYnw9i2Bq7YE5hHdB4w==}
+    peerDependencies:
+      '@rsbuild/core': 1.x
+    peerDependenciesMeta:
+      '@rsbuild/core':
+        optional: true
 
   '@rsbuild/plugin-vue2@1.0.4':
     resolution: {integrity: sha512-x8Ki7UkB8AZv6wWBhjA5U2HZMMrgJh/QojCYx2JfkuM9anaUiOsUis91XlSUqJ+pPHTz9a5KgXP4ljtuUipKpw==}
@@ -1066,6 +1080,9 @@ packages:
     resolution: {integrity: sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q==}
     engines: {node: '>=10'}
 
+  systemjs@6.15.1:
+    resolution: {integrity: sha512-Nk8c4lXvMB98MtbmjX7JwJRgJOL8fluecYCfCeYBznwmpOs8Bf15hLM6z4z71EDAhQVrQrI+wt1aLWSXZq+hXA==}
+
   tapable@2.2.3:
     resolution: {integrity: sha512-ZL6DDuAlRlLGghwcfmSn9sK3Hr6ArtyudlSAiCqQ6IfE+b+HHbydbYDIG15IfS5do+7XQQBdBiubF/cV2dnDzg==}
     engines: {node: '>=6'}
@@ -1384,6 +1401,10 @@ snapshots:
       react-refresh: 0.17.0
     transitivePeerDependencies:
       - webpack-hot-middleware
+
+  '@rsbuild/plugin-umd@1.0.5(@rsbuild/core@1.5.6)':
+    optionalDependencies:
+      '@rsbuild/core': 1.5.6
 
   '@rsbuild/plugin-vue2@1.0.4(@rsbuild/core@1.5.6)(css-loader@7.1.2(@rspack/core@1.5.3(@swc/helpers@0.5.17))(webpack@5.101.3))':
     dependencies:
@@ -2029,6 +2050,8 @@ snapshots:
   supports-color@8.1.1:
     dependencies:
       has-flag: 4.0.0
+
+  systemjs@6.15.1: {}
 
   tapable@2.2.3: {}
 

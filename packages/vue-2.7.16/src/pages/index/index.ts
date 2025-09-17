@@ -2,7 +2,10 @@ import Vue from "vue";
 import App from "./App.vue";
 import "./index.css";
 
-new Vue({
-  el: "#" + import.meta.env.MOUNT_ID,
-  render: (h) => h(App),
-});
+const el = document.getElementById(import.meta.env.MOUNT_ID);
+if (el) {
+  new Vue({
+    el,
+    render: (h) => h(App),
+  });
+}
