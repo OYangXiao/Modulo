@@ -15,7 +15,7 @@ import type { GLOBAL_CONFIG, USER_CONFIG } from "./type.ts";
 export const root = cwd();
 let global_config: GLOBAL_CONFIG;
 
-export function get_global_config(args: ModuloArgs_Pack) {
+export function get_global_config(args: ModuloArgs_Pack): GLOBAL_CONFIG {
   if (!global_config) {
     /**
      * 读取配置文件

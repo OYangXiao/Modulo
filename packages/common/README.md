@@ -1,5 +1,5 @@
 # common 库
 
-用于提供 vue 和 react 的外部依赖
+用于提供部分特殊的外部依赖：
 
-主要是 react-17.0.2 的 jsx-runtime 比较特别，因为没有单独的 umd 和 esm 包，因此需要修改过的 react 库以正常运行
+- react-jsx-runtime，该库是 react 包的一部分，但是没有独立对外提供，因此会在 react 组件被独立打包的时候每个组件包含一份，提取出来后可以减少打包体积

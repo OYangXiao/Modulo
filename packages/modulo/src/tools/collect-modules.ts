@@ -8,11 +8,11 @@ import type { ModuloArgs_Pack } from "../args/index.ts";
 
 export function collect_modules(
   args: ModuloArgs_Pack,
-  kind: "pages" | "modules"
+  kind: "page" | "module"
 ) {
   const global_config = get_global_config(args);
   const framework_name = get_framework_name();
-  const module_path = global_config.input[kind];
+  const module_path = global_config.input[`${kind}s`];
   const exist = existsSync(module_path);
   debug_log(
     picocolors.blue("check module_path"),

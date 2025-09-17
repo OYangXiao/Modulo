@@ -2,13 +2,21 @@
 
 import("../src/index.ts")
   .then((module) => {
-    console.log("support ts, use Typescript code");
-    module.exec();
+    console.log("\nsupport ts, use Typescript code\n");
+    try {
+      module.exec();
+    } catch (e) {
+      console.error(e);
+    }
   })
   .catch((e) => {
     console.error(e);
     import("../dist/index.js").then((module) => {
-      console.log("not support ts, use JavaScript code");
-      module.exec();
+      console.log("\nnot support ts, use JavaScript code\n");
+      try {
+        module.exec();
+      } catch (e) {
+        console.error(e);
+      }
     });
   });

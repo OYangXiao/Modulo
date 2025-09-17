@@ -2,7 +2,7 @@ import minimist from "minimist";
 import { default_config_file_name } from "../config/example/example-config.ts";
 import type { preset_ui_libs } from "../config/preset/libs.ts";
 import { get_cmd, type ModuloCmd_Init, type ModuloCmd_Pack } from "./cmd.ts";
-import { get_mode } from "./mode.ts";
+import { get_env } from "./mode.ts";
 import { set_node_env } from "./node_env.ts";
 import { get_preset_for_init } from "./preset.ts";
 import {
@@ -16,7 +16,7 @@ export interface ModuloArgs_Pack {
   target: ModuloTarget_Pack;
   pack: {
     config: string;
-    mode: "dev" | "prd";
+    env: "dev" | "prd";
     watch: boolean;
     esm: boolean;
   };
@@ -55,12 +55,12 @@ export function get_args() {
           config:
             (argv.config as string | undefined) || default_config_file_name,
           // 运行模式, dev | prd
-          mode: cmd === "build" || cmd === "dev" ? get_mode(argv, cmd) : "prd",
+          env: cmd === "build" || cmd === "dev" ? get_env(argv, cmd) : "prd",
           watch,
           esm: argv.format === "esm" || argv.f === "esm",
         },
       };
-      args.pack.mode && set_node_env(args.pack.mode);
+      args.pack.env && set_node_env(args.pack.env);
     } else {
       args = {
         cmd,

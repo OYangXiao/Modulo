@@ -8,87 +8,55 @@
     "filenameHash": true
   },
   "url": {
-    "base": "/packages/react-17.0.2/dist"
+    "base": "/"
   },
   "alias": {
     "@": "{input.src}"
   },
   "html": {
-    "title": "Modulo Page",
-    "meta": {
-      "viewport": "width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
-    },
     "root": "app",
+    "title": "Modulo Page",
+    "meta": {},
     "tags": [
       {
         "tag": "script",
         "attrs": {
-          "src": "/packages/webhost/dist/webhost.iife.js"
+          "src": "/packages/webhost/dist/webhost.system.js"
         },
-        "head": true,
         "append": false,
         "publicPath": false
       }
     ]
   },
-  "minify": false,
-  "externals": [
-    {
-      "global": "React",
+  "dev_server": {
+    "proxy": {}
+  },
+  "externals": {
+    "react": {
       "importName": [
         "react",
         "React"
       ],
-      "name": "react",
-      "preset": "react",
-      "publicPath": false,
       "url": {
-        "prd": {
-          "umd": "/packages/common/js/react-17.0.2/umd/react.production.min.js",
-          "esm": "https://cdn.jsdelivr.net/npm/react@17.0.2/+esm"
-        },
-        "dev": {
-          "umd": "/packages/common/js/react-17.0.2/umd/react.development.min.js",
-          "esm": "https://cdn.jsdelivr.net/npm/react@17.0.2/+esm"
-        }
+        "umd": "https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.production.min.js",
+        "esm": "https://cdn.jsdelivr.net/npm/react@17.0.2/+esm"
       }
     },
-    {
-      "global": "ReactDOM",
-      "importName": "react-dom",
-      "name": "react-dom",
-      "preset": "react",
-      "publicPath": false,
-      "url": {
-        "umd": "/packages/common/js/react-17.0.2/umd/react-dom.production.min.js",
-        "esm": "https://cdn.jsdelivr.net/npm/react-dom@17.0.2/+esm"
-      }
+    "react-dom": {
+      "umd": "https://cdn.jsdelivr.net/npm/react-dom@17.0.2/index.min.js",
+      "esm": "https://cdn.jsdelivr.net/npm/react-dom@17.0.2/+esm"
     },
-    {
-      "global": "ReactJsxRuntime",
-      "importName": "react/jsx-runtime",
-      "name": "react/jsx-runtime",
-      "preset": "react",
-      "publicPath": false,
-      "url": {
-        "umd": "/packages/common/js/react-17.0.2/umd/react-jsx-runtime.production.min.js",
-        "esm": "/packages/common/js/react-17.0.2/esm/react-jsx-runtime.js"
-      }
+    "react/jsx-runtime": {
+      "umd": "/packages/common/js/react-17.0.2/umd/react-jsx-runtime.js",
+      "esm": "/packages/common/js/react-17.0.2/esm/react-jsx-runtime.js"
     },
-    {
+    "jquery": {
       "global": "jQuery",
-      "importName": [
-        "jquery",
-        "jQuery"
-      ],
-      "name": "jQuery",
-      "publicPath": false,
       "url": "https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
+    },
+    "rxjs": {
+      "umd": "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/dist/bundles/rxjs.umd.min.js",
+      "esm": "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/+esm"
     }
-  ],
-  "dev_server": {
-    "open": false,
-    "port": 8080,
-    "proxy": {}
   }
 }

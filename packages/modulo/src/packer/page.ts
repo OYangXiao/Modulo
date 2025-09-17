@@ -4,65 +4,28 @@ import { pluginLess } from "@rsbuild/plugin-less";
 import picocolors from "picocolors";
 import type { ModuloArgs_Pack } from "../args/index.ts";
 import { get_global_config } from "../config/index.ts";
-import { collect_modules } from "../tools/collect-modules.ts";
 import { get_package_root } from "../tools/find-path-root.ts";
-import { get_externals_and_tags } from "../tools/get-externals-and-tags.ts";
 import { framework_plugin } from "../tools/get-ui-plugin.ts";
-import { omit_root_path_for_entries } from "../tools/omit-root-path.ts";
-import { externals_to_importmap } from "../tools/externals-to-importmap.ts";
 import { pluginUmd } from "@rsbuild/plugin-umd";
+import { prepare_config } from "./prepare.ts";
 
 export async function page_pack(args: ModuloArgs_Pack) {
   const config = get_global_config(args);
 
-  console.log(picocolors.blueBright("\n**** 开始构建 【page】 ****"));
+  const { entries, externals, importmaps_tag, html_tags } = prepare_config(
+    args,
+    "page",
+    config
+  );
 
-  const page_entries = collect_modules(args, "pages");
-
-  console.log(picocolors.blue("\nbase path"), config.url.base);
-
-  if (!page_entries) {
-    return console.log(picocolors.red("\n没有要构建的页面，跳过\n"));
-  } else {
-    console.log(
-      `${picocolors.blue("\npage entries:")}\n${JSON.stringify(
-        omit_root_path_for_entries(page_entries),
-        null,
-        2
-      )}\n`
-    );
+  if (!entries) {
+    return;
   }
-
-  const externals = get_externals_and_tags(args, config.externals);
-
-  console.log(
-    `${picocolors.blue("\nexternals:")}\n${JSON.stringify(
-      externals,
-      null,
-      2
-    )}\n`
-  );
-
-  const importmaps_tag = {
-    append: false,
-    head: true,
-    tag: "script",
-    attrs: { type: args.pack.esm ? "importmap" : "systemjs-importmap" },
-    children: externals_to_importmap(args, config.externals),
-  };
-
-  console.log(
-    `${picocolors.blue("\nimportmaps:")}\n${JSON.stringify(
-      JSON.parse(importmaps_tag.children),
-      null,
-      2
-    )}\n`
-  );
 
   const rsbuildConfig = defineConfig({
     source: {
       define: config.define,
-      entry: page_entries,
+      entry: entries,
     },
     plugins: [
       framework_plugin(),
@@ -93,7 +56,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
       meta: config.html.meta,
       mountId: config.html.root,
       scriptLoading: args.pack.esm ? "module" : "defer",
-      tags: [importmaps_tag, ...config.html.tags],
+      tags: [importmaps_tag, ...html_tags],
       template:
         config.html.template ||
         resolve(get_package_root(), "template/index.html"),
