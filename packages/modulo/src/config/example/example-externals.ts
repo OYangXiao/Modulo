@@ -1,7 +1,7 @@
 import type { ExternalLibs } from "../externals.ts";
 
 // 构建会将以下依赖排除在外，不打包进产物，也可配置更多的依赖
-export const vue_example_externals: ExternalLibs = {
+export const vue2_example_externals: ExternalLibs = {
   vue: {
     // 支持多个importName，以避免import Vue from 'Vue'这种不正规的写法
     importName: ["vue", "Vue"],
@@ -15,7 +15,7 @@ export const vue_example_externals: ExternalLibs = {
     },
   },
 };
-export const react_example_externals: ExternalLibs = {
+export const react17_example_externals: ExternalLibs = {
   react: {
     importName: ["react", "React"],
     url: {
@@ -42,6 +42,6 @@ export const common_example_externals: ExternalLibs = {
 };
 
 export const presets = {
-  vue: { ...vue_example_externals, ...common_example_externals },
-  react: { ...react_example_externals, ...common_example_externals },
+  vue2: { ...vue2_example_externals, ...common_example_externals },
+  react17: { ...react17_example_externals, ...common_example_externals },
 };

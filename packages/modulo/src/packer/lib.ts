@@ -21,7 +21,7 @@ export async function lib_pack(args: ModuloArgs_Pack) {
       define: config.define,
       entry: entries,
     },
-    plugins: [framework_plugin(), pluginLess()],
+    plugins: [framework_plugin(args), pluginLess()],
     resolve: {
       alias: config.alias,
     },

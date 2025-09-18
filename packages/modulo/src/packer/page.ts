@@ -28,7 +28,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
       entry: entries,
     },
     plugins: [
-      framework_plugin(),
+      framework_plugin(args),
       pluginLess(),
       pluginUmd({
         name: "modulo-page",
