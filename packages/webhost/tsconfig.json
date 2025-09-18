@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "lib": [
+      "DOM",
+      "ES2020"
+    ],
     "allowImportingTsExtensions": true,
     "allowJs": true,
     "noEmit": true,

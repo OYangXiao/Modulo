@@ -10,6 +10,7 @@ import { pluginReact } from "@rsbuild/plugin-react";
 import { pluginVue2 } from "@rsbuild/plugin-vue2";
 import { createRsbuild, defineConfig as core_defineConfig } from "@rsbuild/core";
 import { fileURLToPath } from "node:url";
+import { pluginUmd } from "@rsbuild/plugin-umd";
 const logFile = join(process.cwd(), "modulo.debug.log");
 let index = 0;
 let debug_log_function;
@@ -56,14 +57,10 @@ function PANIC_IF(status = false, msg = "SOMETHING'S WRONG", halt = true) {
     }
 }
 function merge_user_config(target, input) {
-    for(const key in input)if (key in target) {
+    for(const key in input){
         const from = input[key];
         const to = target[key];
-        if (typeof from !== typeof to) {
-            target[key] = from;
-            continue;
-        }
-        if (Array.isArray(to)) {
+        if (typeof from === typeof to && key in target) if (Array.isArray(to)) {
             PANIC_IF(!Array.isArray(from));
             target[key] = [
                 ...to,
@@ -71,23 +68,30 @@ function merge_user_config(target, input) {
             ];
         } else if ("object" == typeof to) merge_user_config(to, from);
         else target[key] = from;
+        else {
+            target[key] = from;
+            continue;
+        }
     }
 }
+const preset_alias = {
+    "@": "{input.src}"
+};
 const preset_dev_server_config = {
     open: false,
     port: 8080,
     proxy: {}
 };
 const preset_input_dirs = {
-    modules: 'modules',
-    pages: 'pages',
-    src: 'src'
+    src: "src",
+    pages: "pages",
+    modules: "modules"
 };
 const preset_output_dirs = {
-    dist: 'dist',
-    filenameHash: true,
-    modules: 'modules',
-    pages: ''
+    dist: "dist",
+    pages: "",
+    modules: "modules",
+    filenameHash: true
 };
 const default_html_config = {
     meta: {},
@@ -130,40 +134,31 @@ const preset_config = {
     analyze: false,
     define: {},
     dev_server: preset_dev_server_config,
-    externals: [],
+    externals: {},
     html: default_html_config,
     input: preset_input_dirs,
     minify: preset_minify_config,
     output: preset_output_dirs,
     ui_lib: preset_ui_libs,
     url: preset_url_config,
-    alias: {}
+    alias: preset_alias
 };
-const config_root = cwd();
-let config_packagejson = null;
-function get_packagejson() {
-    if (!config_packagejson) {
-        config_packagejson = jsonparse(resolve_and_read(config_root, "package.json"));
-        PANIC_IF(!config_packagejson, "根目录下没有package.json");
-        PANIC_IF(!config_packagejson.name, "package.json缺少name字段");
-    }
-    return config_packagejson;
-}
-let config_global_config;
+const generate_config_root = cwd();
+let generate_config_global_config;
 function get_global_config(args) {
-    if (!config_global_config) {
-        const user_config = jsonparse(resolve_and_read(config_root, args.pack.config));
+    if (!generate_config_global_config) {
+        const user_config = jsonparse(resolve_and_read(generate_config_root, args.pack.config));
         PANIC_IF(!user_config, "根目录下没有配置文件");
         debug_log("input user config", user_config);
         merge_user_config(preset_config, user_config);
         const _config = preset_config;
-        const src = external_node_path_resolve(config_root, _config.input.src);
+        const src = external_node_path_resolve(generate_config_root, _config.input.src);
         const input = {
             modules: external_node_path_resolve(src, _config.input.modules),
             pages: external_node_path_resolve(src, _config.input.pages),
             src: src
         };
-        const dist = external_node_path_resolve(config_root, _config.output.dist);
+        const dist = external_node_path_resolve(generate_config_root, _config.output.dist);
         const output = {
             ..._config.output,
             dist: dist,
@@ -172,28 +167,43 @@ function get_global_config(args) {
         };
         const html = _config.html?.template ? {
             ..._config.html,
-            template: external_node_path_resolve(config_root, _config.html.template)
+            template: external_node_path_resolve(generate_config_root, _config.html.template)
         } : _config.html;
-        const define = {
-            ...Object.fromEntries(Object.entries(_config.define).map(([k, v])=>[
-                    k,
-                    JSON.stringify(v)
-                ])),
-            "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV)
-        };
+        const define = Object.fromEntries(Object.entries({
+            ..._config.define,
+            "process.env.NODE_ENV": process.env.NODE_ENV,
+            "import.meta.env.MOUNT_ID": _config.html.root
+        }).map(([k, v])=>[
+                k,
+                JSON.stringify(v)
+            ]));
         debug_log("当前模式", process.env.NODE_ENV);
-        const minify = true === user_config.minify ? preset_minify_config : user_config.minify;
-        config_global_config = {
+        const minify = true === _config.minify ? preset_minify_config : _config.minify;
+        const alias = Object.fromEntries(Object.entries(_config.alias).map(([k, v])=>[
+                k,
+                v.replace("{input.src}", input.src)
+            ]));
+        generate_config_global_config = {
             ..._config,
             define,
             html,
             input,
             minify,
-            output
+            output,
+            alias
         };
-        debug_log("global config", config_global_config);
+        debug_log("global config", generate_config_global_config);
     }
-    return config_global_config;
+    return generate_config_global_config;
+}
+let config_packagejson = null;
+function get_packagejson() {
+    if (!config_packagejson) {
+        config_packagejson = jsonparse(resolve_and_read(generate_config_root, "package.json"));
+        PANIC_IF(!config_packagejson, "根目录下没有package.json");
+        PANIC_IF(!config_packagejson.name, "package.json缺少name字段");
+    }
+    return config_packagejson;
 }
 const star_line = "**********************";
 async function modify_scripts() {
@@ -226,70 +236,85 @@ async function modify_scripts() {
     writeFileSync(external_node_path_resolve(process.cwd(), "package.json"), new_packagejson);
     console.log(picocolors.green(`\npackage.json修改成功`));
 }
-const example_externals = [
-    {
-        global: 'Vue',
+const vue_example_externals = {
+    vue: {
         importName: [
-            'vue',
-            'Vue'
+            "vue",
+            "Vue"
         ],
-        name: 'vue',
-        preset: 'vue',
-        publicPath: false,
-        url: 'https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.min.js'
-    },
-    {
-        global: 'React',
-        importName: [
-            'react',
-            'React'
-        ],
-        name: 'react',
-        preset: 'react',
-        publicPath: false,
-        url: 'https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.production.min.js'
-    },
-    {
-        global: 'ReactDOM',
-        importName: 'react-dom',
-        name: 'react-dom',
-        preset: 'react',
-        publicPath: false,
-        url: 'https://cdn.jsdelivr.net/npm/react-dom@17.0.2/umd/react-dom.production.min.js'
-    },
-    {
-        global: 'jQuery',
-        importName: [
-            'jquery',
-            'jQuery'
-        ],
-        name: 'jQuery',
-        publicPath: false,
-        url: 'https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'
+        url: {
+            umd: "https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.min.js",
+            esm: "https://cdn.jsdelivr.net/npm/vue@2.7.16/+esm"
+        }
     }
-];
+};
+const react_example_externals = {
+    react: {
+        importName: [
+            "react",
+            "React"
+        ],
+        url: {
+            umd: "https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.production.min.js",
+            esm: "https://cdn.jsdelivr.net/npm/react@17.0.2/+esm"
+        }
+    },
+    "react-dom": {
+        umd: "/packages/common/js/react-17.0.2/umd/react-dom.production.min.js",
+        esm: "https://cdn.jsdelivr.net/npm/react-dom@17.0.2/+esm"
+    },
+    "react/jsx-runtime": {
+        umd: "/packages/common/js/react-17.0.2/umd/react-jsx-runtime.js",
+        esm: "/packages/common/js/react-17.0.2/esm/react-jsx-runtime.js"
+    }
+};
+const common_example_externals = {
+    jquery: "https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js",
+    rxjs: {
+        umd: "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/dist/bundles/rxjs.umd.min.js",
+        esm: "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/+esm"
+    }
+};
+const presets = {
+    vue: {
+        ...vue_example_externals,
+        ...common_example_externals
+    },
+    react: {
+        ...react_example_externals,
+        ...common_example_externals
+    }
+};
 function get_example_config(preset) {
     console.log(picocolors.magenta(`\n${star_line}\n默认配置文件中的externals内容为推荐内容\n请注意手动替换配置文件中externals的url，以保证符合项目需求\n如果不需要externals部分依赖，也可以将他们从列表中删除\n${star_line}\n`));
     return {
-        dev_server: preset_config.dev_server,
-        externals: example_externals.filter((item)=>item.preset === preset || !item.preset),
-        html: {
-            title: "Modulo Page",
-            meta: {
-                viewport: "width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
-            },
-            root: "app"
-        },
-        input: {
-            modules: preset_config.input.modules,
-            pages: preset_config.input.pages
-        },
+        input: preset_config.input,
         output: {
             filenameHash: true
         },
         url: {
             base: "/"
-        }
+        },
+        alias: preset_alias,
+        html: {
+            root: "app",
+            title: "Modulo Page",
+            meta: {},
+            tags: [
+                {
+                    tag: "script",
+                    attrs: {
+                        src: "/packages/webhost/dist/webhost.system.js"
+                    },
+                    append: false,
+                    publicPath: false
+                }
+            ]
+        },
+        dev_server: {
+            proxy: preset_config.dev_server.proxy
+        },
+        externals: preset ? presets[preset] : common_example_externals
     };
 }
 const default_config_file_name = "modulo.config.json";
@@ -304,26 +329,26 @@ function get_cmd(argv) {
     return cmd;
 }
 const mode_list = [
-    'dev',
-    'development',
-    'prd',
-    'production'
+    "dev",
+    "development",
+    "prd",
+    "production"
 ];
-function get_mode(argv, cmd) {
-    let mode = '';
-    if (argv.mode) {
-        if ('dev' === argv.mode || 'development' === argv.mode) mode = 'dev';
-        else if ('prd' === argv.mode || 'production' === argv.mode) mode = 'prd';
-        else PANIC_IF(true, `mode参数只能为 ${mode_list.join(' 或 ')}`);
-        console.log(picocolors.blue(`mode = ${mode}`));
-    } else if ('build' === cmd || 'dev' === cmd) if (process.env.NODE_ENV) {
-        mode = 'production' === process.env.NODE_ENV ? 'prd' : 'dev';
-        console.log(picocolors.yellow('\n未设置mode，将根据process.env.NODE_ENV自动设置\n'), picocolors.yellow(`process.env.NODE_ENV = ${process.env.NODE_ENV}, mode = ${mode}`));
+function get_env(argv, cmd) {
+    let env = "";
+    if (argv.env) {
+        if ("dev" === argv.env || "development" === argv.env) env = "dev";
+        else if ("prd" === argv.env || "production" === argv.env) env = "prd";
+        else PANIC_IF(true, `env参数只能为 ${mode_list.join(" 或 ")}`);
+        console.log(picocolors.blue(`env = ${env}`));
+    } else if ("build" === cmd || "dev" === cmd) if (process.env.NODE_ENV) {
+        env = "production" === process.env.NODE_ENV ? "prd" : "dev";
+        console.log(picocolors.yellow("\n未设置env，将根据process.env.NODE_ENV自动设置\n"), picocolors.yellow(`process.env.NODE_ENV = ${process.env.NODE_ENV}, env = ${env}`));
     } else {
-        mode = 'build' === cmd ? 'prd' : 'dev';
-        console.log(picocolors.yellow('\n未设置mode，将根据build或dev命令自动设置\n'), picocolors.yellow(`cmd = ${cmd}, mode = ${mode}`));
+        env = "build" === cmd ? "prd" : "dev";
+        console.log(picocolors.yellow("\n未设置env，将根据build或dev命令自动设置\n"), picocolors.yellow(`cmd = ${cmd}, env = ${env}`));
     }
-    return mode;
+    return env;
 }
 function set_node_env(mode) {
     const _node_env = 'dev' === mode ? 'development' : 'production';
@@ -388,11 +413,12 @@ function get_args() {
                 target,
                 pack: {
                     config: args_argv.config || default_config_file_name,
-                    mode: "build" === cmd || "dev" === cmd ? get_mode(args_argv, cmd) : "prd",
-                    watch
+                    env: "build" === cmd || "dev" === cmd ? get_env(args_argv, cmd) : "prd",
+                    watch,
+                    esm: "esm" === args_argv.format || "esm" === args_argv.f
                 }
             };
-            args_args.pack.mode && set_node_env(args_args.pack.mode);
+            args_args.pack.env && set_node_env(args_args.pack.env);
         } else args_args = {
             cmd,
             target: get_cmd_target(args_argv, cmd),
@@ -432,10 +458,18 @@ function init_tool(args) {
     if ("config" === args.target) create_config_file(args);
     if ("script" === args.target) modify_scripts();
 }
-function collect_modules(kind) {
-    const global_config = get_global_config();
+function framework_plugin(options) {
+    const { dependencies } = get_packagejson();
     const framework_name = get_framework_name();
-    const module_path = global_config.input[kind];
+    const version = dependencies[framework_name];
+    const global_config = get_global_config();
+    PANIC_IF(global_config.ui_lib[framework_name] !== version, "package.json中只允许使用固定版本号, 并且只支持vue-2.7.16和react-17.0.2");
+    return "vue" === framework_name ? pluginVue2(options) : pluginReact(options);
+}
+function collect_modules(args, kind) {
+    const global_config = get_global_config(args);
+    const framework_name = get_framework_name();
+    const module_path = global_config.input[`${kind}s`];
     const exist = existsSync(module_path);
     debug_log(picocolors.blue("check module_path"), module_path, exist ? "exists" : "NOT exists");
     const module_entries = exist ? readdirSync(module_path, {
@@ -476,63 +510,144 @@ function collect_modules(kind) {
     }).filter((entry)=>!!entry[1]) : [];
     return module_entries.length > 0 ? Object.fromEntries(module_entries) : void 0;
 }
-let external_and_tags;
-function get_externals_and_tags(external_list) {
-    if (!external_and_tags) external_and_tags = external_list.reduce(({ externals, htmlTags }, external)=>{
-        const importNames = Array.isArray(external.importName) ? external.importName : [
-            external.importName
-        ];
-        importNames.forEach((importName)=>{
-            externals[importName] = external.global;
-        });
-        htmlTags.push({
-            append: false,
-            attrs: {
-                src: external.url
-            },
-            hash: false,
-            head: true,
-            publicPath: external.publicPath,
-            tag: "script"
-        });
+const root_path = process.cwd();
+function omit_root_path(path) {
+    return path.replace(root_path, "");
+}
+function omit_root_path_for_entries(entries) {
+    return Object.fromEntries(Object.entries(entries).map(([key, value])=>[
+            key,
+            omit_root_path(value)
+        ]));
+}
+function guard_is_string(data) {
+    return "string" == typeof data;
+}
+function guard_is_record(data) {
+    return !!data && "object" == typeof data;
+}
+function is_umd_url(data) {
+    return guard_is_record(data) && guard_is_string(data.umd);
+}
+function is_esm_url(data) {
+    return guard_is_record(data) && guard_is_string(data.esm);
+}
+function is_module_typed_external_url(data) {
+    return is_umd_url(data) || is_esm_url(data);
+}
+function is_env_external(data) {
+    return guard_is_record(data) && (guard_is_string(data.dev) || is_module_typed_external_url(data.dev)) && (guard_is_string(data.prd) || is_module_typed_external_url(data.prd));
+}
+function get_external_url(args, url) {
+    let _url = url;
+    while(!guard_is_string(_url))if (is_env_external(_url)) _url = _url[args.pack.env];
+    else {
+        const mode = args.pack.esm ? "esm" : "umd";
+        _url = mode in _url ? _url[mode] : void 0;
+    }
+    return _url;
+}
+function get_externals_importmaps(args, external_list) {
+    return Object.entries(external_list).reduce(({ externals, importmaps }, [lib_name, data])=>{
+        const _data = is_env_external(data) ? data[args.pack.env] : data;
+        const external_lib = "string" == typeof _data ? {
+            url: {
+                esm: _data,
+                umd: _data
+            }
+        } : is_module_typed_external_url(_data) ? {
+            url: _data
+        } : _data;
+        const _importName = external_lib.importName || lib_name;
+        (Array.isArray(_importName) ? _importName : [
+            _importName
+        ]).forEach((name)=>externals[name] = lib_name);
+        const url = get_external_url(args, external_lib.url);
+        if (url) importmaps[lib_name] = url;
         return {
             externals,
-            htmlTags
+            importmaps
         };
     }, {
         externals: {},
-        htmlTags: []
+        importmaps: {}
     });
-    return external_and_tags;
 }
-function framework_plugin(options) {
-    const { dependencies } = get_packagejson();
-    const framework_name = get_framework_name();
-    const version = dependencies[framework_name];
-    const global_config = get_global_config();
-    PANIC_IF(global_config.ui_lib[framework_name] !== version, "package.json中只允许使用固定版本号, 并且只支持vue-2.7.16和react-17.0.2");
-    return "vue" === framework_name ? pluginVue2(options) : pluginReact(options);
+let printed = false;
+function prepare_config(args, kind, config) {
+    const { externals, importmaps } = get_externals_importmaps(args, config.externals);
+    printed || console.log(`${picocolors.blue("\nexternals:")}\n${JSON.stringify(externals, null, 2)}\n`);
+    if ("page" === kind) console.log(`${picocolors.blue("html_tags:")}\n${JSON.stringify(config.html.tags, null, 2)}\n`);
+    const importmaps_tag = {
+        append: false,
+        head: true,
+        tag: "script",
+        attrs: {
+            type: args.pack.esm ? "importmap" : "systemjs-importmap"
+        },
+        children: `{
+         "imports": ${JSON.stringify(importmaps, null, 2)}
+      }`
+    };
+    printed || console.log(`${picocolors.blue("\nimportmaps:")}\n${JSON.stringify(importmaps, null, 2)}\n`);
+    printed = true;
+    console.log(picocolors.blueBright(`\n**** 开始构建 【${kind}】 ****`));
+    const entries = collect_modules(args, kind);
+    if (entries) console.log(`${picocolors.blue(`\n${kind} entries:`)}\n${JSON.stringify(omit_root_path_for_entries(entries), null, 2)}\n`);
+    else console.log(picocolors.red(`\n没有要构建的${kind}，跳过\n`));
+    return {
+        entries,
+        externals,
+        importmaps_tag
+    };
 }
 async function lib_pack(args) {
     const config = get_global_config(args);
     const packagejson = get_packagejson();
-    console.log(picocolors.blueBright("\n**** 开始构建 【module】 ****\n"));
-    const module_entries = collect_modules("modules");
-    console.log(picocolors.blue("\nmodule entries: "), module_entries);
-    if (!module_entries) return console.log(picocolors.red("\n没有要构建的模块，跳过"));
-    const { externals } = get_externals_and_tags(config.externals);
-    const umd_dist_dir = external_node_path_resolve(config.output.modules, "umd");
+    const { entries, externals } = prepare_config(args, "module", config);
+    if (!entries) return;
     const rslibConfig = defineConfig({
+        source: {
+            define: config.define,
+            entry: entries
+        },
+        plugins: [
+            framework_plugin(),
+            pluginLess()
+        ],
+        resolve: {
+            alias: config.alias
+        },
         lib: [
+            {
+                format: "esm",
+                syntax: "esnext",
+                dts: false,
+                output: {
+                    assetPrefix: `${config.url.base}/modules`,
+                    externals,
+                    distPath: {
+                        root: config.output.modules,
+                        js: "esm",
+                        jsAsync: "esm",
+                        css: "css"
+                    },
+                    minify: config.minify
+                }
+            },
             {
                 format: "umd",
                 output: {
-                    assetPrefix: `${config.url.base}/modules/umd`,
-                    distPath: {
-                        root: umd_dist_dir
-                    },
+                    assetPrefix: `${config.url.base}/modules`,
                     externals,
-                    minify: config.minify
+                    distPath: {
+                        root: config.output.modules,
+                        js: "umd",
+                        jsAsync: "umd",
+                        css: "css"
+                    },
+                    minify: config.minify,
+                    injectStyles: true
                 },
                 syntax: "es6",
                 umdName: `${packagejson.name}-modules-[name]`
@@ -550,19 +665,6 @@ async function lib_pack(args) {
             chunkSplit: {
                 strategy: "all-in-one"
             }
-        },
-        plugins: [
-            framework_plugin(),
-            pluginLess()
-        ],
-        resolve: {
-            alias: {
-                "@": config.input.src
-            }
-        },
-        source: {
-            define: config.define,
-            entry: module_entries
         }
     });
     await build(rslibConfig, {
@@ -589,24 +691,27 @@ function get_package_root() {
 }
 async function page_pack(args) {
     const config = get_global_config(args);
-    console.log(picocolors.blueBright("\n**** 开始构建 【page】 ****"));
-    const page_entries = collect_modules("pages");
-    console.log(picocolors.blue("\n\npage entries: "), page_entries, picocolors.blue("\nbase path"), config.url.base);
-    if (!page_entries) return console.log(picocolors.red("\n没有要构建的页面，跳过"));
-    const { externals, htmlTags } = get_externals_and_tags(config.externals);
+    const { entries, externals, importmaps_tag } = prepare_config(args, "page", config);
+    if (!entries) return;
     const rsbuildConfig = core_defineConfig({
-        html: {
-            meta: config.html.meta,
-            mountId: config.html.root,
-            tags: [
-                ...htmlTags,
-                ...config.html.tags
-            ],
-            template: config.html.template || external_node_path_resolve(get_package_root(), "template/index.html"),
-            templateParameters: {
-                base_prefix: config.url.base
+        source: {
+            define: config.define,
+            entry: entries
+        },
+        plugins: [
+            framework_plugin(),
+            pluginLess(),
+            pluginUmd({
+                name: "modulo-page"
+            })
+        ],
+        tools: {
+            rspack: {
+                experiments: {
+                    outputModule: args.pack.esm
+                }
             },
-            title: config.html.title
+            htmlPlugin: true
         },
         output: {
             assetPrefix: config.url.cdn || config.url.base,
@@ -618,14 +723,22 @@ async function page_pack(args) {
             legalComments: "none",
             minify: config.minify
         },
-        plugins: [
-            framework_plugin(),
-            pluginLess()
-        ],
+        html: {
+            meta: config.html.meta,
+            mountId: config.html.root,
+            scriptLoading: args.pack.esm ? "module" : "defer",
+            tags: [
+                importmaps_tag,
+                ...config.html.tags
+            ],
+            template: config.html.template || external_node_path_resolve(get_package_root(), "template/index.html"),
+            templateParameters: {
+                base_prefix: config.url.base
+            },
+            title: config.html.title
+        },
         resolve: {
-            alias: {
-                "@": config.input.src
-            }
+            alias: config.alias
         },
         server: {
             base: config.url.base,
@@ -633,12 +746,10 @@ async function page_pack(args) {
             port: config.dev_server.port,
             proxy: config.dev_server.proxy
         },
-        source: {
-            define: {
-                "import.meta.env.MOUNT_ID": config.html.root,
-                ...config.define
-            },
-            entry: page_entries
+        performance: {
+            chunkSplit: {
+                strategy: "split-by-experience"
+            }
         }
     });
     const rsbuild = await createRsbuild({

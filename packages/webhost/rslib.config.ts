@@ -33,8 +33,8 @@ export default defineConfig({
   },
   source: {
     entry: {
-      module: "./src/module.ts",
-      system: "./src/system.ts",
+      module: "./src/webhost-module.ts",
+      system: "./src/webhost-system.ts",
     },
   },
 });
