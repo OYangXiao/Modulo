@@ -12,11 +12,10 @@ import { get_root_element, load_vue_module } from "./module.ts";
  */
 export async function init_vue2_component(
   module: any,
-  root: HTMLElement | string,
+  element: HTMLElement,
   props: any
 ): Promise<any> {
   const Vue = (await System.import("vue")).default;
-  const element = get_root_element(root);
   const initiator = Vue.extend(module);
   if (element && initiator) {
     const component = new initiator({
@@ -27,13 +26,9 @@ export async function init_vue2_component(
   }
 }
 
-export function unmount_vue2_component(
-  root: HTMLElement | string,
-  component: any
-) {
-  const root_element = get_root_element(root);
+export function unmount_vue2_component(element: HTMLElement, component: any) {
   component && component.$destroy();
-  root_element && root_element.removeChild(component.$el);
+  element && element.removeChild(component.$el);
   return true;
 }
 
@@ -54,12 +49,21 @@ export async function mount_vue2_component({
   const module = await load_vue_module(path);
 
   if (module && element) {
-    const component = await init_vue2_component(module, element, props);
-    if (element) {
+    const shadow_root =
+      element.shadowRoot || element.attachShadow({ mode: "open" });
+    const _element = document.createElement(element.tagName);
+    shadow_root.appendChild(_element);
+
+    const component = await init_vue2_component(module, _element, props);
+    if (component) {
+      const css_link = document.createElement("link");
+      css_link.href = path.replace(".js", ".css");
+      css_link.rel = "stylesheet";
+      shadow_root.prepend(css_link);
       return {
         component,
-        element,
-        unmount: () => unmount_vue2_component(element, component),
+        element: _element,
+        unmount: () => unmount_vue2_component(_element, component),
       };
     }
   }

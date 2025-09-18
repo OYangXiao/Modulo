@@ -10,7 +10,6 @@ import { System } from "../systemjs.ts";
  */
 export async function load_module(path: string, key?: string, key2?: string) {
   const module = await System.import(path);
-  console.log("module", path, module);
   if (module) {
     let _module = key ? module[key] : module.default;
     if (key2) {

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      h1 {
+        color: red;
+      }
+      p {
+        color: blue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <h1>欢迎买股票</h1>
+      <p>你是关注{stockName}吗？</p>
+      <button>点击咨询</button>
+    </div>
+  </body>
+  <script>
+    (function () {
+      return function update(root) {
+        let stockName = "股票";
+        const button = root.querySelector("button");
+        button.onclick = function () {
+          alert("点击咨询关于" + stockName + "的信息");
+        };
+        return function (params) {
+          stockName = params.stockName;
+
+          const p = root.querySelector("p");
+          p.textContent = `你是关注${params.stockName}吗？`;
+        };
+      };
+    })();
+  </script>
+</html>

@@ -1,6 +1,7 @@
 <template>
   <div class="mod">
     <h1>this is vue bare mod</h1>
+    <div class="same-name"></div>
   </div>
 </template>
 <script lang="ts">
@@ -15,6 +16,14 @@ export default {
   }
 }
 </script>
+
+<style>
+.same-name {
+  width: 100px;
+  height: 100px;
+  background-color: aqua;
+}
+</style>
 
 <style scoped>
 .mod {

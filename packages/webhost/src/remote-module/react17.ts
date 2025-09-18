@@ -10,14 +10,13 @@ import { get_root_element, load_module } from "./module.ts";
  *
  * @returns 挂载的组件实例。
  */
-export async function init_react_component(
+export async function init_react17_component(
   module: any,
-  root: HTMLElement | string,
+  element: ShadowRoot,
   props: any
 ): Promise<any> {
   const React = await System.import("react");
   const ReactDOM = await System.import("react-dom");
-  const element = get_root_element(root);
   const component = React.createElement(module, props);
   if (element) {
     ReactDOM.render(component, element);
@@ -27,20 +26,18 @@ export async function init_react_component(
 
 export async function update_react_component(
   component: any,
-  root: HTMLElement | string,
+  element: ShadowRoot,
   props: any
 ) {
   const React = await System.import("react");
   const ReactDOM = await System.import("react-dom");
-  const element = get_root_element(root);
   ReactDOM.unmountComponentAtNode(element);
   const new_component = React.cloneElement(component, props);
   ReactDOM.render(new_component, element);
   return new_component;
 }
 
-export async function unmount_react_component(root: HTMLElement | string) {
-  const element = get_root_element(root);
+export async function unmount_react_component(element: ShadowRoot) {
   const ReactDOM = await System.import("react-dom");
   if (element) {
     ReactDOM.unmountComponentAtNode(element);
@@ -68,12 +65,20 @@ export async function mount_react_component({
   const module = await load_module(path, key);
 
   if (module && element) {
-    const component = await init_react_component(module, element, props);
+    const shadow_root =
+      element.shadowRoot || element.attachShadow({ mode: "open" });
+    const component = await init_react17_component(module, shadow_root, props);
+
     if (component) {
+      const css_link = document.createElement("link");
+      css_link.href = path.replace(".js", ".css");
+      css_link.rel = "stylesheet";
+      shadow_root.prepend(css_link);
+
       const react_component = {
         component: component,
-        element,
-        unmount: () => unmount_react_component(element),
+        element: shadow_root,
+        unmount: () => unmount_react_component(shadow_root),
         update(props: any) {
           return (react_component.component = update_react_component(
             react_component.component,

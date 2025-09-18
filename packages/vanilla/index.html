@@ -46,6 +46,80 @@
     }
     init()
   </script>
+  <script>
+    class WebhostIsolatedElement extends HTMLElement {
+
+      static get observedAttributes() {
+        return ['html', 'params']; // 必须返回要监听的属性数组
+      }
+
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.attachShadow({ mode: 'open' });
+        console.log('connectedCallback')
+        const attr_html =  this.getAttribute('html')
+        const attr_params = this.getAttribute('params')
+
+        this.setHtml(attr_html)
+        this.updateData(attr_params)
+      }
+
+
+      attributeChangedCallback(name, oldValue, newValue) {
+        console.log(name, oldValue, newValue)
+        if(name === 'params'){
+          this.updateData(newValue)
+        }
+        if(name === 'html'){
+          this.setHtml(newValue)
+        }
+      }
+
+
+      setHtml(url){
+        if(!this.shadowRoot){
+          console.log('shadowRoot is null')
+          return 
+        }
+        this.shadowRoot.innerHTML = ''
+        fetch(url)
+          .then(response => response.text())
+          .then(html => {
+            const template = document.createElement('template')
+            template.innerHTML = html
+            const scripts = template.content.querySelectorAll('script')
+            const component_script = scripts[scripts.length - 1]
+            const script_content = component_script.innerText
+            component_script.remove()
+            
+            this.shadowRoot.appendChild(template.content)
+
+            const script = eval(script_content)
+            this._update = script(this.shadowRoot)
+          })
+      }
+
+      updateData(params){
+        if(this._update){
+          this._update(params)
+        }
+      }
+    }
+    customElements.define('webhost-isolated-element', WebhostIsolatedElement)
+  </script>
+  
+  <webhost-isolated-element id="html-component" html="./banner.html"></webhost-isolated-element>
+  <!-- <script>
+    setTimeout(() => {
+      
+    const html_component = document.getElementById('html-component')
+    html_component.setAttribute('html', '/packages/vanilla/html-component/index.html')
+    html_component.setAttribute('params', JSON.stringify({stockName:'腾讯'}))
+    }, 1000);
+  </script> -->
 </body>
 
 </html>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import style from './index.module.css'
 import reactImg from './react.png'
+import './global.css'
 
 export const Counter = ({ start }: { start?: number }) => {
   const [num, setNum] = useState(start || 0)
@@ -17,5 +18,6 @@ export const Counter = ({ start }: { start?: number }) => {
   return <div className={style['counter-wrapper']}>
     React Counter: <div className={style['counter-number']}>{num}</div>
     <img style={{ width: '50px' }} src={reactImg} alt="react" />
+    <div className="same-name"></div>
   </div>;
 }

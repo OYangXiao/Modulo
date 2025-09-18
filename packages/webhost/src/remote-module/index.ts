@@ -1,4 +1,4 @@
-import { mount_react_component } from "./react.ts";
+import { mount_react_component } from "./react17.ts";
 import { mount_vue2_component } from "./vue2.ts";
 
 export async function mount_module(params: {
