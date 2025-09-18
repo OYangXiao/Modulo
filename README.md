@@ -41,18 +41,21 @@ pnpm install
 我们强烈建议您从示例项目开始，以了解 `modulo` 的实际用法。
 
 - **运行 React 示例**:
+
   ```bash
   cd packages/react-17.0.2
   pnpm run dev:page
   ```
 
 - **运行 Vue 示例**:
+
   ```bash
   cd packages/vue-2.7.16
   pnpm run dev:page
   ```
 
 - **参考 `webhost` 用法**: `packages/vanilla` 项目提供了 `webhost` 库的调用示例，展示了如何加载和挂载 React 和 Vue 模块。
+- **live-preview**: 使用 vscode 的 live-preview 功能，可以实时预览示例项目的运行效果。目前 vue 和 react 两个项目的配置都按照此路径配置了公共路径。
 
 每个示例项目的 `README.md` 文件都包含了更详细的说明。
 
