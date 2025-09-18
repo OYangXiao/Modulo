@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <script type="systemjs-importmap">
+{
+  "imports": {
+     "react": "https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.production.min.js",
+  "react-dom": "/packages/common/js/react-17.0.2/umd/react-dom.production.min.js",
+  "react/jsx-runtime": "/packages/common/js/react-17.0.2/umd/react-jsx-runtime.js",
+  "jquery": "https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js",
+  "rxjs": "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/dist/bundles/rxjs.umd.min.js",
+  "vue": "/packages/vue-2.7.16/node_modules/vue/dist/vue.js"
+  }
+}
+</script>
+  <!-- <script src="/packages/vue-2.7.16/node_modules/vue/dist/vue.js"></script> -->
+  <script src="/packages/webhost/dist/webhost.system.js"></script>
+<body>
+  <div id="react-app"></div>
+  <div id="vue-bare-app"></div>
+  <div id="vue-extended-app"></div>
+  <script>
+    async function init(){
+      const React = await System.import('react')
+      const ReactDOM = await System.import('react-dom')
+      const react_module = await System.import('/packages/react-17.0.2/dist/modules/umd/counter.js')
+      console.log(react_module)
+      const react_component = React.createElement(react_module.Counter)
+      ReactDOM.render(react_component, document.querySelector('#react-app'));
+
+
+
+      const _Vue = await System.import('vue')
+      const Vue = _Vue.default
+      const vue_bare_module = await System.import('/packages/vue-2.7.16/dist/modules/umd/vue-bare-mod.js')
+      const vue_bare_component = Vue.extend(vue_bare_module.default.default)
+      console.log('vue_bare_component',vue_bare_component)
+      new vue_bare_component({
+        el: document.querySelector('#vue-bare-app'),
+      });
+
+      const vue_extended_module = await System.import('/packages/vue-2.7.16/dist/modules/umd/vue-extended-mod.js')
+      const vue_extended_component = Vue.extend(vue_extended_module.default.default)
+      console.log('vue_extended_module',vue_extended_component)
+      new vue_extended_component({
+        el: document.querySelector('#vue-extended-app'),
+      });
+    }
+    init()
+  </script>
+</body>
+
+</html>

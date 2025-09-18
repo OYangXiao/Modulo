@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
+    "target": "ESNext",
+    "strict": true,
+    "allowJs": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "declaration": false,
+    "declarationMap": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "input": {
+    "src": "src",
+    "pages": "pages",
+    "modules": "modules"
+  },
+  "output": {
+    "filenameHash": true
+  },
+  "url": {
+    "base": "/packages/react-17.0.2/dist"
+  },
+  "alias": {
+    "@": "{input.src}"
+  },
+  "html": {
+    "root": "app",
+    "title": "Modulo Page",
+    "meta": {},
+    "tags": [
+      {
+        "tag": "script",
+        "attrs": {
+          "src": "/packages/webhost/dist/webhost.system.js"
+        },
+        "append": false,
+        "publicPath": false
+      }
+    ]
+  },
+  "dev_server": {
+    "proxy": {}
+  },
+  "externals": {
+    "react": {
+      "importName": [
+        "react",
+        "React"
+      ],
+      "url": {
+        "umd": "https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.production.min.js",
+        "esm": "https://cdn.jsdelivr.net/npm/react@17.0.2/+esm"
+      }
+    },
+    "react-dom": {
+      "umd": "/packages/common/js/react-17.0.2/umd/react-dom.production.min.js",
+      "esm": "https://cdn.jsdelivr.net/npm/react-dom@17.0.2/+esm"
+    },
+    "react/jsx-runtime": {
+      "umd": "/packages/common/js/react-17.0.2/umd/react-jsx-runtime.js",
+      "esm": "/packages/common/js/react-17.0.2/esm/react-jsx-runtime.js"
+    },
+    "jquery": "https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js",
+    "rxjs": {
+      "umd": "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/dist/bundles/rxjs.umd.min.js",
+      "esm": "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/+esm"
+    }
+  }
+}
