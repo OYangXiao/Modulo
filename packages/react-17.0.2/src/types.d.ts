@@ -1,11 +1,17 @@
-export {};
+declare interface ImportMetaEnv {
+  MOUNT_ID: string;
+}
 
-declare global {
-  interface ImportMetaEnv {
-    MOUNT_ID: string;
-  }
+declare interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
 
-  interface ImportMeta {
-    readonly env: ImportMetaEnv;
-  }
+declare module "*.css" {
+  const classes: { readonly [key: string]: string };
+  export default classes;
+}
+
+declare module "*.png" {
+  const content: string;
+  export default content;
 }

@@ -9,7 +9,16 @@
   },
   "name": "vue-2.7.16",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "build:page": "modulo build page",
+    "build:module": "modulo build module",
+    "build:all": "modulo build all",
+    "build": "modulo build all",
+    "dev:page": "modulo dev page",
+    "dev:module": "modulo dev module",
+    "watch:page": "modulo build page --watch=true",
+    "watch:module": "modulo build module --watch=true"
+  },
   "type": "module",
   "version": "1.0.0"
 }

@@ -2,14 +2,20 @@
   <div class="content">
     <h1>Rsbuild with Vue</h1>
     <p>Start building amazing things with Rsbuild.</p>
+    <vue-show></vue-show>
+    <vue-show-bare></vue-show-bare>
   </div>
 </template>
 <script lang="ts">
-export default {
-  mounted(){
-    
+import vue from 'vue'
+import VueShow from '@/modules/vue-extended-mod/index.vue'
+import VueShowBare from '@/modules/vue-bare-mod/index.vue'
+
+export default vue.extend({
+  components: { VueShow, VueShowBare },
+  mounted() {
   }
-}
+})
 </script>
 
 <style scoped>
@@ -20,6 +26,7 @@ export default {
   text-align: center;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .content h1 {

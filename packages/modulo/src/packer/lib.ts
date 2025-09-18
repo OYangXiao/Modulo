@@ -1,4 +1,3 @@
-import { resolve } from "node:path";
 import { pluginLess } from "@rsbuild/plugin-less";
 import { build, defineConfig } from "@rslib/core";
 import picocolors from "picocolors";
@@ -17,20 +16,28 @@ export async function lib_pack(args: ModuloArgs_Pack) {
     return;
   }
 
-  // 支持导出umd和esm
-  const umd_dist_dir = resolve(config.output.modules, "umd");
-  const esm_dist_dir = resolve(config.output.modules, "esm");
-
   const rslibConfig = defineConfig({
+    source: {
+      define: config.define,
+      entry: entries,
+    },
+    plugins: [framework_plugin(), pluginLess()],
+    resolve: {
+      alias: config.alias,
+    },
     lib: [
       {
         format: "esm",
         syntax: "esnext",
         dts: false,
         output: {
+          assetPrefix: `${config.url.base}/modules`,
           externals,
           distPath: {
-            root: esm_dist_dir,
+            root: config.output.modules,
+            js: "esm",
+            jsAsync: "esm",
+            css: "css",
           },
           minify: config.minify,
         },
@@ -38,12 +45,16 @@ export async function lib_pack(args: ModuloArgs_Pack) {
       {
         format: "umd",
         output: {
-          assetPrefix: `${config.url.base}/modules/umd`,
-          distPath: {
-            root: umd_dist_dir,
-          },
+          assetPrefix: `${config.url.base}/modules`,
           externals,
+          distPath: {
+            root: config.output.modules,
+            js: "umd",
+            jsAsync: "umd",
+            css: "css",
+          },
           minify: config.minify,
+          injectStyles: true,
         },
         syntax: "es6",
         umdName: `${packagejson.name}-modules-[name]`,
@@ -52,9 +63,6 @@ export async function lib_pack(args: ModuloArgs_Pack) {
     output: {
       legalComments: "none",
       target: "web",
-      // cssModules: {
-      //   exportGlobals: true,
-      // },
     },
     performance: {
       bundleAnalyze: config.analyze
@@ -66,14 +74,6 @@ export async function lib_pack(args: ModuloArgs_Pack) {
       chunkSplit: {
         strategy: "all-in-one",
       },
-    },
-    plugins: [framework_plugin(), pluginLess()],
-    resolve: {
-      alias: config.alias,
-    },
-    source: {
-      define: config.define,
-      entry: entries,
     },
   });
 

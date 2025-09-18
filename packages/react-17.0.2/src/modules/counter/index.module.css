@@ -1,0 +1,13 @@
+.counter-number{
+  color: red;
+}
+
+.counter-wrapper{
+  color: black;
+  background: url(./bg.png) no-repeat center center;
+  background-size: contain;
+  width: 200px;
+  height: 100px;
+  flex: 0 0 100px;
+}
+

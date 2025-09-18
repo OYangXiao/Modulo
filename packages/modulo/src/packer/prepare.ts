@@ -2,7 +2,7 @@ import picocolors from "picocolors";
 import type { ModuloArgs_Pack } from "../args/index.ts";
 import { collect_modules } from "../tools/collect-modules.ts";
 import { omit_root_path_for_entries } from "../tools/omit-root-path.ts";
-import { get_externals_and_tags } from "../tools/get-externals-and-tags.ts";
+import { get_externals_importmaps } from "./get-externals-and-tags.ts";
 import type { GLOBAL_CONFIG } from "../config/type.ts";
 
 let printed = false;
@@ -12,7 +12,7 @@ export function prepare_config(
   kind: "page" | "module",
   config: GLOBAL_CONFIG
 ) {
-  const { externals, importmaps, iife_tags } = get_externals_and_tags(
+  const { externals, importmaps } = get_externals_importmaps(
     args,
     config.externals
   );
@@ -26,11 +26,10 @@ export function prepare_config(
       )}\n`
     );
 
-  const html_tags = [...config.html.tags, ...iife_tags];
   if (kind === "page") {
     console.log(
       `${picocolors.blue("html_tags:")}\n${JSON.stringify(
-        html_tags,
+        config.html.tags,
         null,
         2
       )}\n`
@@ -73,5 +72,5 @@ export function prepare_config(
     );
   }
 
-  return { entries, externals, importmaps_tag, html_tags };
+  return { entries, externals, importmaps_tag };
 }

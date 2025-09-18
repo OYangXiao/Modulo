@@ -16,10 +16,7 @@ export function is_esm_url(data: unknown): data is EsmExternalUrl {
   return is_record(data) && is_string(data.esm);
 }
 
-export type ModuleTypedExternalUrl =
-  | UmdExternalUrl
-  | EsmExternalUrl
-  | (UmdExternalUrl & EsmExternalUrl);
+export type ModuleTypedExternalUrl = UmdExternalUrl | EsmExternalUrl;
 
 export function is_module_typed_external_url(
   data: unknown
@@ -45,9 +42,8 @@ export type ConfigExternalUrl =
   | EnvExternalUrl
   | string;
 
-export interface GlobalExternal {
+export interface ImportExternal {
   url: ConfigExternalUrl;
-  global: string;
   importName?: string | string[];
   preset?: string;
 }
@@ -60,12 +56,6 @@ export function is_url_config(data: unknown): data is ConfigExternalUrl {
   );
 }
 
-export function is_global_external(data: unknown): data is GlobalExternal {
-  return is_record(data) && is_url_config(data.url) && is_string(data.global);
-}
-
-export type ImportExternal = Omit<GlobalExternal, "global">;
-
 export function is_import_external(data: unknown): data is ImportExternal {
   // 没有global的一概作为import的依赖
   return is_record(data) && is_url_config(data.url) && !is_string(data.global);
@@ -73,7 +63,6 @@ export function is_import_external(data: unknown): data is ImportExternal {
 
 export type ExternalLibs = {
   [name: string]:
-    | GlobalExternal
     | ImportExternal
     | ModuleTypedExternalUrl
     | EnvExternalUrl

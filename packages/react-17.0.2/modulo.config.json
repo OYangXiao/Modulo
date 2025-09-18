@@ -8,7 +8,7 @@
     "filenameHash": true
   },
   "url": {
-    "base": "/"
+    "base": "/packages/react-17.0.2/dist"
   },
   "alias": {
     "@": "{input.src}"
@@ -43,17 +43,14 @@
       }
     },
     "react-dom": {
-      "umd": "https://cdn.jsdelivr.net/npm/react-dom@17.0.2/index.min.js",
+      "umd": "/packages/common/js/react-17.0.2/umd/react-dom.production.min.js",
       "esm": "https://cdn.jsdelivr.net/npm/react-dom@17.0.2/+esm"
     },
     "react/jsx-runtime": {
       "umd": "/packages/common/js/react-17.0.2/umd/react-jsx-runtime.js",
       "esm": "/packages/common/js/react-17.0.2/esm/react-jsx-runtime.js"
     },
-    "jquery": {
-      "global": "jQuery",
-      "url": "https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
-    },
+    "jquery": "https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js",
     "rxjs": {
       "umd": "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/dist/bundles/rxjs.umd.min.js",
       "esm": "https://cdn.jsdelivr.net/npm/rxjs@7.8.2/+esm"

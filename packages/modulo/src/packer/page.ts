@@ -12,7 +12,7 @@ import { prepare_config } from "./prepare.ts";
 export async function page_pack(args: ModuloArgs_Pack) {
   const config = get_global_config(args);
 
-  const { entries, externals, importmaps_tag, html_tags } = prepare_config(
+  const { entries, externals, importmaps_tag } = prepare_config(
     args,
     "page",
     config
@@ -56,7 +56,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
       meta: config.html.meta,
       mountId: config.html.root,
       scriptLoading: args.pack.esm ? "module" : "defer",
-      tags: [importmaps_tag, ...html_tags],
+      tags: [importmaps_tag, ...config.html.tags],
       template:
         config.html.template ||
         resolve(get_package_root(), "template/index.html"),
@@ -79,6 +79,11 @@ export async function page_pack(args: ModuloArgs_Pack) {
         : false,
       port: config.dev_server.port,
       proxy: config.dev_server.proxy,
+    },
+    performance: {
+      chunkSplit: {
+        strategy: "split-by-experience",
+      },
     },
   });
 
