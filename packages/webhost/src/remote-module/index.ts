@@ -2,11 +2,11 @@ import { mount_react_component } from "./react.ts";
 import { mount_vue2_component } from "./vue2.ts";
 
 export async function mount_module(params: {
+  type: "react" | "vue2";
   path: string;
   root: HTMLElement | string;
   key?: string;
   props?: any;
-  type: "react" | "vue2";
 }) {
   const { type, ...rest } = params;
   if (type === "react") {

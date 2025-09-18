@@ -23,23 +23,22 @@
   <div id="vue-extended-app"></div>
   <script>
     async function init(){
-      // The webhost functions are now exposed globally via window.webhost
-      // No need to import them from SystemJS directly here.
+      // webhost 函数现在通过 window.webhost.remote_module 全局暴露
 
-      // Load and mount React component
+      // 加载并挂载 React 组件
       window.webhost.remote_module.mount_react({
         path:'/packages/react-17.0.2/dist/modules/umd/counter.js', 
         root:'#react-app', 
         key:'Counter'
       });
 
-      // Load and mount Vue bare module
+      // 加载并挂载 Vue 裸模块组件
       window.webhost.remote_module.mount_vue2({
         path:'/packages/vue-2.7.16/dist/modules/umd/vue-bare-mod.js', 
         root:'#vue-bare-app'
       });
 
-      // Load and mount Vue extended module
+      // 加载并挂载 Vue 扩展模块组件
       window.webhost.remote_module.mount_vue2({
         path:'/packages/vue-2.7.16/dist/modules/umd/vue-extended-mod.js', 
         root:'#vue-extended-app'

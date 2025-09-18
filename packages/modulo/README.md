@@ -140,6 +140,7 @@ Modulo 的一大特性是**自动入口发现**，您无需在配置文件中手
   - `title` (`string`): 页面标题。**默认值**: `"Modulo Page"`。
   - `meta` (`object`): 一个键值对对象，用于生成 `<meta>` 标签。
   - `tags` (`array`): 一个对象数组，用于在 HTML 中注入自定义的 `<script>` 或 `<link>` 等标签。
+    - **特别说明**: `webhost` 库的 `webhost.system.js` 文件会作为默认配置项自动注入到此处的 `tags` 中，以提供模块加载能力。
 
 ---
 
@@ -257,6 +258,6 @@ Modulo 的一大特性是**自动入口发现**，您无需在配置文件中手
 
 ### `webhost` 的作用
 
-`webhost` 库（位于 `packages/webhost`）旨在与此外部依赖加载机制协同工作。它提供了一个统一的实用函数 `window.webhost.loadModule`，可简化加载和挂载依赖于这些外部框架的模块的过程。
+`webhost` 库（位于 `packages/webhost`）旨在与此外部依赖加载机制协同工作。**`webhost` 会通过 `modulo.config.json` 中 `html.tags` 配置项自动注入到所有页面应用中，以提供开箱即用的模块加载能力。** 它提供了一组实用函数，通过 `window.webhost.remote_module` 对象暴露，可简化加载和挂载依赖于这些外部框架的模块的过程。
 
-`window.webhost.loadModule` 函数内部使用 SystemJS 导入指定的模块及其依赖项（通过导入映射解析），然后处理初始化和挂载的框架特定逻辑，并能自动识别 React 或 Vue 组件。
+`window.webhost.remote_module.mount` 函数内部使用 SystemJS 导入指定的模块及其依赖项（通过导入映射解析），然后处理初始化和挂载的框架特定逻辑，并能自动识别 React 或 Vue 组件。此外，还提供了 `mount_react` 和 `mount_vue2` 等特定框架的挂载函数。

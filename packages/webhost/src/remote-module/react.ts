@@ -2,13 +2,13 @@ import { System } from "../systemjs.ts";
 import { get_root_element, load_module } from "./module.ts";
 
 /**
- * Mounts a React component to a specified DOM element.
- * Assumes React and ReactDOM are already loaded via SystemJS.
- * @param component The React component to mount.
- * @param selector The CSS selector of the DOM element to mount to.
- * @param props Optional: The props to pass to the component.
+ * 将 React 组件初始化并挂载到指定的 DOM 元素。
+ * 假设 React 和 ReactDOM 已经通过 SystemJS 加载。
+ * @param module 要挂载的 React 组件模块。
+ * @param root DOM 元素的 HTMLElement 实例或 CSS 选择器字符串。
+ * @param props 可选：传递给组件的 props。
  *
- * @returns The mounted component instance.
+ * @returns 挂载的组件实例。
  */
 export async function init_react_component(
   module: any,
@@ -50,9 +50,8 @@ export async function unmount_react_component(root: HTMLElement | string) {
 }
 
 /**
- * 一个函数执行load和mount两个操作
- * 并且返回react component
- * 以及update和unmount函数
+ * 一个函数，执行加载和挂载 React 组件的操作。
+ * 并返回 React 组件实例以及更新和卸载函数。
  */
 export async function mount_react_component({
   path,

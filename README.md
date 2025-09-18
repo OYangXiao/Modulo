@@ -16,6 +16,7 @@
 │   ├── modulo/         # 核心打包工具
 │   ├── react-17.0.2/   # React 示例项目
 │   ├── vue-2.7.16/     # Vue 示例项目
+│   ├── webhost/        # 模块加载宿主库，提供 React 和 Vue 模块的加载和挂载功能
 │   └── ...             # 其他辅助包和示例
 └── README.md           # 本文档
 ```
@@ -23,6 +24,7 @@
 - **`packages/modulo`**: `modulo` CLI 工具的核心代码。如果您想了解其工作原理或为其贡献代码，这里是您的起点。
 - **`packages/react-17.0.2`**: 一个使用 `modulo` 构建的 React 17 示例应用。
 - **`packages/vue-2.7.16`**: 一个使用 `modulo` 构建的 Vue 2.7 示例应用。
+- **`packages/webhost`**: 模块加载宿主库，提供 React 和 Vue 模块的加载和挂载功能，并通过 `window.webhost.remote_module` 暴露 API。
 
 ## 🚀 快速开始
 
@@ -49,6 +51,8 @@ pnpm install
   cd packages/vue-2.7.16
   pnpm run dev:page
   ```
+
+- **参考 `webhost` 用法**: `packages/vanilla` 项目提供了 `webhost` 库的调用示例，展示了如何加载和挂载 React 和 Vue 模块。
 
 每个示例项目的 `README.md` 文件都包含了更详细的说明。
 
