@@ -1,6 +1,6 @@
 import picocolors from "picocolors";
 import type { ModuloArgs_Pack } from "../args/index.ts";
-import { collect_modules } from "../tools/collect-modules.ts";
+import { collect_modules } from "./collect-modules.ts";
 import { omit_root_path_for_entries } from "../tools/omit-root-path.ts";
 import { get_externals_importmaps } from "./get-externals-and-tags.ts";
 import type { GLOBAL_CONFIG } from "../config/type.ts";

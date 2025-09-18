@@ -2,8 +2,8 @@ import { existsSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import picocolors from "picocolors";
 import { get_global_config } from "../config/index.ts";
-import { debug_log } from "./debug-log.ts";
-import { get_framework_name } from "./get-framework-name.ts";
+import { debug_log } from "../tools/debug-log.ts";
+import { get_framework_name } from "../tools/get-framework-name.ts";
 import type { ModuloArgs_Pack } from "../args/index.ts";
 
 export function collect_modules(
