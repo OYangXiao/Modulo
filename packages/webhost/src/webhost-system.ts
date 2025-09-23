@@ -1,6 +1,6 @@
 import { mount_module } from "./remote-module/index.ts";
 import { load_module } from "./remote-module/module.ts";
-import { mount_react_component } from "./remote-module/react17.ts";
+import { mount_react_component } from "./remote-module/react.ts";
 import { mount_vue2_component } from "./remote-module/vue2.ts";
 import { System } from "./systemjs.ts";
 

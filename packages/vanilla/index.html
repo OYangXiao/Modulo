@@ -27,22 +27,16 @@
 
       // 加载并挂载 React 组件
       window.webhost.remote_module.mount_react({
-        path:'/packages/react-17.0.2/dist/modules/umd/counter.js', 
+        path:'/packages/react-17.0.2/dist/modules/umd/react-counter.js', 
         root:'#react-app', 
         key:'Counter'
       });
 
       // 加载并挂载 Vue 裸模块组件
       window.webhost.remote_module.mount_vue2({
-        path:'/packages/vue-2.7.16/dist/modules/umd/vue-bare-mod.js', 
+        path:'/packages/vue-2.7.16/dist/modules/umd/vue-module.js', 
         root:'#vue-bare-app'
       });
-
-      // 加载并挂载 Vue 扩展模块组件
-      window.webhost.remote_module.mount_vue2({
-        path:'/packages/vue-2.7.16/dist/modules/umd/vue-extended-mod.js', 
-        root:'#vue-extended-app'
-      });    
     }
     init()
   </script>
@@ -94,7 +88,7 @@
             const component_script = scripts[scripts.length - 1]
             const script_content = component_script.innerText
             component_script.remove()
-            
+
             this.shadowRoot.appendChild(template.content)
 
             const script = eval(script_content)

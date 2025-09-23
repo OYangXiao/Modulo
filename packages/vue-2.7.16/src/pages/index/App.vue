@@ -2,17 +2,15 @@
   <div class="content">
     <h1>Rsbuild with Vue</h1>
     <p>Start building amazing things with Rsbuild.</p>
-    <vue-show></vue-show>
-    <vue-show-bare></vue-show-bare>
+    <vue-module></vue-module>
   </div>
 </template>
 <script lang="ts">
 import vue from 'vue'
-import VueShow from '@/modules/vue-extended-mod/index.vue'
-import VueShowBare from '@/modules/vue-bare-mod/index.vue'
+import VueModule from '@/modules/vue-module/index.vue'
 
 export default vue.extend({
-  components: { VueShow, VueShowBare },
+  components: { VueModule },
   mounted() {
   }
 })

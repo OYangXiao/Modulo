@@ -1,4 +1,4 @@
-import { Counter } from '@/modules/counter';
+import { Counter } from '@/modules/react-counter';
 import './App.css';
 import $ from 'jquery';
 import { useLayoutEffect, useRef } from 'react';
