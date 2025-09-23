@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .yomi-class {
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      function create_picture_tag(params) {
+        const {
+          webp,
+          png,
+          jpg,
+          alt,
+          width,
+          height,
+          class: _class,
+          id,
+          style,
+        } = params;
+        const parser = new DOMParser();
+        const _dom = parser.parseFromString(
+          `<picture>${
+            webp ? `<source srcset="${webp}" type="image/webp">` : ""
+          }${
+            jpg && png ? `<source srcset="${png}" type="image/png">` : ""
+          }<img src="${jpg || png}"${alt ? ` alt="${alt}"` : ""}${
+            _class ? ` class="${_class}"` : ""
+          }${id ? ` id="${id}"` : ""}${style ? ` style="${style}"` : ""}${
+            width ? ` width="${width}"` : ""
+          }${height ? ` height="${height}"` : ""}></picture>`,
+          "text/html"
+        );
+        const dom = _dom.body.firstChild;
+        const img = dom.querySelector("img");
+        !img.style.width && (img.style.width = "100%");
+        return dom;
+      }
+
+      class AutoDowngradePicture extends HTMLElement {
+        constructor() {
+          super();
+          this.params = {};
+          this.movedData = {};
+          this.debouncedRender = this.debounce(this.setData.bind(this), 100);
+          this._isConnected = false;
+        }
+
+        static get observedAttributes() {
+          return [
+            "preset",
+            "size",
+            "png",
+            "webp",
+            "jpg",
+            "jpeg",
+            "alt",
+            "class",
+            "id",
+            "width",
+            "height",
+            "mode", // block代表内部img 100%宽高，inline代表样式被复制到内部
+          ]; // 必须返回要监听的属性数组
+        }
+
+        connectedCallback() {
+          this.setData();
+          this._isConnected = true;
+        }
+
+        disconnectedCallback() {
+          this._isConnected = false;
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+          if (
+            // 组件已连接
+            this._isConnected
+          ) {
+            if (
+              // 属性实际发生变化
+              oldValue !== newValue
+            ) {
+              // 并且不是组件自己把attribute move走的情况才重新渲染
+              if (newValue !== null || oldValue !== this.movedData[name]) {
+                this.debouncedRender();
+              }
+            }
+          }
+        }
+
+        // 防抖函数
+        debounce(func, wait) {
+          let timeout;
+          return function executedFunction(...args) {
+            const later = () => {
+              clearTimeout(timeout);
+              func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+          };
+        }
+
+        setData() {
+          const _mode = this.getAttribute("mode");
+          const mode = _mode === "inline" ? "inline" : "block";
+
+          this.params = {};
+
+          this.params.png = this.getAttribute("png");
+          this.params.webp = this.getAttribute("webp");
+          const jpg = this.getAttribute("jpg");
+          const jpeg = this.getAttribute("jpeg");
+          this.params.jpg = jpg || jpeg;
+          const _alt = this.getAttribute("alt");
+          this.params.alt = _alt || this.params.alt;
+          _alt && this.removeAttribute("alt");
+          this.movedData.alt = _alt;
+
+          if (mode === "inline") {
+            // 移除外部的style, class, id, width, height属性，防止样式重复生效
+            this.params.width = this.getAttribute("width");
+            this.params.width && this.removeAttribute("width");
+            this.movedData.width = this.params.width;
+
+            this.params.height = this.getAttribute("height");
+            this.params.height && this.removeAttribute("height");
+            this.movedData.height = this.params.height;
+
+            this.params.style = this.getAttribute("style");
+            this.params.style && this.removeAttribute("style");
+            this.movedData.style = this.params.style;
+
+            this.params.class = this.getAttribute("class");
+            this.params.class && this.removeAttribute("class");
+            this.movedData.class = this.params.class;
+
+            this.params.id = this.getAttribute("id");
+            this.params.id && this.removeAttribute("id");
+            this.movedData.id = this.params.id;
+          }
+
+          this.innerHTML = "";
+          this.appendChild(create_picture_tag(this.params));
+          if (mode === "block") {
+            this.style.display === "" && (this.style.display = "inline-block");
+            const imgDom = this.querySelector("img");
+            if (imgDom && imgDom.style.width === "") {
+              imgDom.style.width = "100%";
+            }
+          }
+        }
+      }
+
+      customElements.define("auto-downgrade-picture", AutoDowngradePicture);
+    </script>
+
+    <div style="display: flex; align-items: center">
+      <div
+        style="width: 30px; height: 30px; border-radius: 50%; overflow: hidden"
+      >
+        <auto-downgrade-picture
+          class="test-class"
+          style="width: 100%"
+          mode="inline"
+        ></auto-downgrade-picture>
+      </div>
+      <span> hahaha </span>
+    </div>
+    <auto-downgrade-picture
+      class="test-class"
+      style="width: 400px; height: 300px; overflow: hidden"
+    ></auto-downgrade-picture>
+  </body>
+</html>
