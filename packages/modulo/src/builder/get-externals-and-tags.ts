@@ -1,22 +1,19 @@
-import type { ModuloArgs_Pack } from "../args/index.ts";
+import type { ModuloArgs_Build } from "../args/index.ts";
 import {
   is_env_external,
   type ExternalLibs,
-  type ImportExternal,
   is_module_typed_external_url,
-  type ModuleTypedExternalUrl,
   type ConfigExternalUrl,
 } from "../config/externals.ts";
-import type { Tag } from "../config/preset/html.ts";
 import { is_string } from "../type/guard.ts";
 
-function get_external_url(args: ModuloArgs_Pack, url: ConfigExternalUrl) {
+function get_external_url(args: ModuloArgs_Build, url: ConfigExternalUrl) {
   let _url = url;
   while (!is_string(_url)) {
     if (is_env_external(_url)) {
-      _url = _url[args.pack.env];
+      _url = _url[args.build.env];
     } else {
-      const mode = args.pack.esm ? "esm" : "umd";
+      const mode = args.build.esm ? "esm" : "umd";
       _url = mode in _url ? (_url as any)[mode] : undefined;
     }
   }
@@ -24,14 +21,14 @@ function get_external_url(args: ModuloArgs_Pack, url: ConfigExternalUrl) {
 }
 
 export function get_externals_importmaps(
-  args: ModuloArgs_Pack,
+  args: ModuloArgs_Build,
   external_list: ExternalLibs
 ) {
   return Object.entries(external_list).reduce(
     ({ externals, importmaps }, [lib_name, data]) => {
       // 归一化为GlobalExternal或者ImportExternal
       // 此处类型推导有问题，因此手动断言
-      const _data = is_env_external(data) ? data[args.pack.env] : data;
+      const _data = is_env_external(data) ? data[args.build.env] : data;
       const external_lib =
         typeof _data === "string"
           ? { url: { esm: _data, umd: _data } }

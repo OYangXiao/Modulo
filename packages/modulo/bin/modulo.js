@@ -2,7 +2,6 @@
 
 import("../src/index.ts")
   .then((module) => {
-    console.log("\nsupport ts, use Typescript code\n");
     try {
       module.exec();
     } catch (e) {
@@ -10,13 +9,18 @@ import("../src/index.ts")
     }
   })
   .catch((e) => {
-    console.error(e);
-    import("../dist/index.js").then((module) => {
-      console.log("\nnot support ts, use JavaScript code\n");
-      try {
-        module.exec();
-      } catch (e) {
+    import("../node_modules/tsx/dist/esm/api/index.mjs")
+      .then((tsx) => {
+        console.log("\nuse tsx to support Typescript\n");
+        tsx.tsImport("../src/index.ts", import.meta.url).then((module) => {
+          try {
+            module.exec();
+          } catch (e) {
+            console.error(e);
+          }
+        });
+      })
+      .catch((e) => {
         console.error(e);
-      }
-    });
+      });
   });

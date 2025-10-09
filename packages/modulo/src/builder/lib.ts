@@ -1,12 +1,12 @@
 import { pluginLess } from "@rsbuild/plugin-less";
 import { build, defineConfig } from "@rslib/core";
 import picocolors from "picocolors";
-import type { ModuloArgs_Pack } from "../args/index.ts";
+import type { ModuloArgs_Build } from "../args/index.ts";
 import { get_global_config, get_packagejson } from "../config/index.ts";
 import { framework_plugin } from "../tools/get-ui-plugin.ts";
 import { prepare_config } from "./prepare.ts";
 
-export async function lib_pack(args: ModuloArgs_Pack) {
+export async function build_lib(args: ModuloArgs_Build) {
   const config = get_global_config(args);
   const packagejson = get_packagejson();
 
@@ -76,7 +76,7 @@ export async function lib_pack(args: ModuloArgs_Pack) {
     },
   });
 
-  await build(rslibConfig, { watch: args.cmd === "build" && args.pack.watch });
+  await build(rslibConfig, { watch: args.cmd === "build" && args.build.watch });
 
   if (args.cmd === "build") {
     console.log(picocolors.green("\n**** 构建【module】完成 ****\n"));

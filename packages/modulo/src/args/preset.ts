@@ -1,7 +1,7 @@
 import type minimist from "minimist";
 import picocolors from "picocolors";
 import { detect_preset } from "./get-framework-name.ts";
-import { PANIC_IF } from "../tools/panic.ts";
+import { expect } from "../tools/expect.ts";
 
 export function get_preset_for_init(argv: minimist.ParsedArgs) {
   let preset = argv.preset;
@@ -17,7 +17,7 @@ export function get_preset_for_init(argv: minimist.ParsedArgs) {
   }
 
   preset &&
-    PANIC_IF(
+    expect(
       preset !== "react17" && preset !== "vue2",
       "目前只支持react17和vue2"
     );

@@ -2,14 +2,14 @@ import { resolve } from "node:path";
 import { createRsbuild, defineConfig } from "@rsbuild/core";
 import { pluginLess } from "@rsbuild/plugin-less";
 import picocolors from "picocolors";
-import type { ModuloArgs_Pack } from "../args/index.ts";
+import type { ModuloArgs_Build } from "../args/index.ts";
 import { get_global_config } from "../config/index.ts";
 import { get_package_root } from "../tools/find-path-root.ts";
 import { framework_plugin } from "../tools/get-ui-plugin.ts";
 import { pluginUmd } from "@rsbuild/plugin-umd";
 import { prepare_config } from "./prepare.ts";
 
-export async function page_pack(args: ModuloArgs_Pack) {
+export async function build_page(args: ModuloArgs_Build) {
   const config = get_global_config(args);
 
   const { entries, externals, importmaps_tag } = prepare_config(
@@ -37,7 +37,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
     tools: {
       rspack: {
         experiments: {
-          outputModule: args.pack.esm,
+          outputModule: args.build.esm,
         },
       },
       htmlPlugin: true,
@@ -55,7 +55,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
     html: {
       meta: config.html.meta,
       mountId: config.html.root,
-      scriptLoading: args.pack.esm ? "module" : "defer",
+      scriptLoading: args.build.esm ? "module" : "defer",
       tags: [importmaps_tag, ...config.html.tags],
       template:
         config.html.template ||
@@ -89,7 +89,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
 
   const rsbuild = await createRsbuild({ rsbuildConfig });
   await rsbuild[args.cmd === "dev" ? "startDevServer" : "build"]({
-    watch: args.cmd === "build" && args.pack.watch,
+    watch: args.cmd === "build" && args.build.watch,
   });
 
   if (args.cmd === "build") {

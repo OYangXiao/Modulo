@@ -1,11 +1,10 @@
 import { resolve } from "node:path";
 import { cwd } from "node:process";
-import type { ModuloArgs_Pack } from "../args/index.ts";
+import type { ModuloArgs_Build } from "../args/index.ts";
 import { debug_log } from "../tools/debug-log.ts";
 import { resolve_and_read } from "../tools/file.ts";
-import { jsonparse } from "../tools/json.ts";
 import { merge_user_config } from "../tools/merge-user-config.ts";
-import { PANIC_IF } from "../tools/panic.ts";
+import { expect } from "../tools/expect.ts";
 import { preset_config } from "./preset/index.ts";
 import { preset_minify_config } from "./preset/minify.ts";
 import type { GLOBAL_CONFIG, USER_CONFIG } from "./type.ts";
@@ -15,17 +14,23 @@ import type { GLOBAL_CONFIG, USER_CONFIG } from "./type.ts";
 export const root = cwd();
 let global_config: GLOBAL_CONFIG;
 
-export function get_global_config(args: ModuloArgs_Pack): GLOBAL_CONFIG {
+export const create_config = (config: USER_CONFIG) => config;
+
+export type args
+
+export async function merge_config(
+  args: ModuloArgs_Build
+): Promise<GLOBAL_CONFIG> {
   if (!global_config) {
     /**
      * 读取配置文件
      */
 
     // biome-ignore lint/style/noNonNullAssertion: <有panic保护>
-    const user_config = jsonparse<USER_CONFIG>(
-      resolve_and_read(root, args.pack.config)
-    )!;
-    PANIC_IF(!user_config, "根目录下没有配置文件");
+    const user_config = await import(
+      resolve_and_read(root, args.build.config)
+    ).then((m) => m.default(args.build) as USER_CONFIG);
+    expect(!user_config, "根目录下没有配置文件");
     debug_log("input user config", user_config);
 
     /**

@@ -1,4 +1,4 @@
-import { PANIC_IF } from "./panic.ts";
+import { expect } from "./expect.ts";
 
 export function merge_user_config(target: any, input: any) {
   for (const key in input) {
@@ -9,7 +9,7 @@ export function merge_user_config(target: any, input: any) {
       continue;
     } else {
       if (Array.isArray(to)) {
-        PANIC_IF(!Array.isArray(from));
+        expect(!Array.isArray(from));
         target[key] = [...to, ...from];
       } else if (typeof to === "object") {
         merge_user_config(to, from);

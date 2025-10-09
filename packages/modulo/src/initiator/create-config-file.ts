@@ -2,6 +2,7 @@
 import { existsSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import readline from "node:readline";
+import utils from "node:util";
 import picocolors from "picocolors";
 import type { ModuloArgs_Init } from "../args/index.ts";
 import {
@@ -39,7 +40,14 @@ export async function create_config_file(args: ModuloArgs_Init) {
 
   writeFileSync(
     filepath,
-    JSON.stringify(get_example_config(args.init.preset), null, 2)
+    `import { create_config } from "@yannick-z/modulo";\n\nexport default create_config(${utils.inspect(
+      get_example_config(args.init.preset),
+      {
+        depth: null, // 无限深度
+        colors: false, // 不要颜色代码
+        compact: false, // 不压缩输出
+      }
+    )});`
   );
 
   console.log(picocolors.green("创建成功"), filepath);

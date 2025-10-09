@@ -1,6 +1,6 @@
 import type minimist from "minimist";
-import { PANIC_IF } from "../tools/panic.ts";
-import type { ModuloCmd_Init, ModuloCmd_Pack } from "./cmd";
+import { expect } from "../tools/expect.ts";
+import type { ModuloCmd_Init, ModuloCmd_Build } from "./cmd.ts";
 
 const pack_options = {
   page: "构建页面",
@@ -23,7 +23,7 @@ const options = {
 export type ModuloTarget_Pack = keyof typeof pack_options;
 export type ModuloTarget_Init = keyof typeof init_options;
 
-export function get_cmd_target<T extends ModuloCmd_Pack | ModuloCmd_Init>(
+export function get_cmd_target<T extends ModuloCmd_Build | ModuloCmd_Init>(
   argv: minimist.ParsedArgs,
   cmd: T
 ) {
@@ -31,11 +31,11 @@ export function get_cmd_target<T extends ModuloCmd_Pack | ModuloCmd_Init>(
 
   const target_list = options[cmd];
 
-  PANIC_IF(
+  expect(
     !(target in target_list),
-    `modulo ${cmd} 命令必须执行 ${Object.entries(target_list).map(
-      ([k, v]) => `\n${k} - ${v}`
-    )} 几种目标`
+    `modulo ${cmd} 命令缺少必须得参数\n例如 ${Object.entries(target_list).map(
+      ([k, v]) => `\n${k} : ${v}`
+    )}`
   );
 
   return target as T extends ModuloCmd_Init

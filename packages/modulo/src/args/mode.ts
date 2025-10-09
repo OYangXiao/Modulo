@@ -1,6 +1,6 @@
 import type minimist from "minimist";
 import picocolors from "picocolors";
-import { PANIC_IF } from "../tools/panic.ts";
+import { expect } from "../tools/expect.ts";
 
 const mode_list = ["dev", "development", "prd", "production"];
 
@@ -13,7 +13,7 @@ export function get_env(argv: minimist.ParsedArgs, cmd: "dev" | "build") {
     } else if (argv.env === "prd" || argv.env === "production") {
       env = "prd";
     } else {
-      PANIC_IF(true, `env参数只能为 ${mode_list.join(" 或 ")}`);
+      expect(true, `env参数只能为 ${mode_list.join(" 或 ")}`);
     }
     console.log(picocolors.blue(`env = ${env}`));
   } else if (cmd === "build" || cmd === "dev") {

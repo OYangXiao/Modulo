@@ -1,5 +1,5 @@
 import picocolors from "picocolors";
-import type { ModuloArgs_Pack } from "../args/index.ts";
+import type { ModuloArgs_Build } from "../args/index.ts";
 import { collect_modules } from "./collect-modules.ts";
 import { omit_root_path_for_entries } from "../tools/omit-root-path.ts";
 import { get_externals_importmaps } from "./get-externals-and-tags.ts";
@@ -8,7 +8,7 @@ import type { GLOBAL_CONFIG } from "../config/type.ts";
 let printed = false;
 
 export function prepare_config(
-  args: ModuloArgs_Pack,
+  args: ModuloArgs_Build,
   kind: "page" | "module",
   config: GLOBAL_CONFIG
 ) {
@@ -40,7 +40,7 @@ export function prepare_config(
     append: false,
     head: true,
     tag: "script",
-    attrs: { type: args.pack.esm ? "importmap" : "systemjs-importmap" },
+    attrs: { type: args.build.esm ? "importmap" : "systemjs-importmap" },
     children: `{
          "imports": ${JSON.stringify(importmaps, null, 2)}
       }`,
