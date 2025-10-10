@@ -4,13 +4,13 @@ import { resolve } from "node:path";
 import readline from "node:readline";
 import utils from "node:util";
 import picocolors from "picocolors";
-import type { ModuloArgs_Init } from "../args/index.ts";
+import type { Modulo_Init_Args } from "../args/index.ts";
 import {
   default_config_file_name,
   get_example_config,
 } from "../config/example/example-config.ts";
 
-export async function create_config_file(args: ModuloArgs_Init) {
+export async function create_config_file(args: Modulo_Init_Args) {
   const path = args.init.path || default_config_file_name;
   console.log(picocolors.blue("即将创建配置文件"), path);
 

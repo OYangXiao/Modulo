@@ -3,10 +3,10 @@ import { type PluginVueOptions, pluginVue2 } from "@rsbuild/plugin-vue2";
 import { get_global_config, get_packagejson } from "../config/index.ts";
 import { get_framework_name } from "./get-framework-name.ts";
 import { expect } from "./expect.ts";
-import type { ModuloArgs_Build } from "../args/index.ts";
+import type { Modulo_Build_Args } from "../args/index.ts";
 
 export function framework_plugin(
-  args: ModuloArgs_Build,
+  args: Modulo_Build_Args,
   options?: PluginVueOptions | PluginReactOptions
 ) {
   const { dependencies } = get_packagejson();

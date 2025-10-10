@@ -2,14 +2,14 @@ import { resolve } from "node:path";
 import { createRsbuild, defineConfig } from "@rsbuild/core";
 import { pluginLess } from "@rsbuild/plugin-less";
 import picocolors from "picocolors";
-import type { ModuloArgs_Build } from "../args/index.ts";
+import type { Modulo_Build_Args } from "../args/index.ts";
 import { get_global_config } from "../config/index.ts";
 import { get_package_root } from "../tools/find-path-root.ts";
 import { framework_plugin } from "../tools/get-ui-plugin.ts";
 import { pluginUmd } from "@rsbuild/plugin-umd";
 import { prepare_config } from "./prepare.ts";
 
-export async function build_page(args: ModuloArgs_Build) {
+export async function build_page(args: Modulo_Build_Args) {
   const config = get_global_config(args);
 
   const { entries, externals, importmaps_tag } = prepare_config(

@@ -1,4 +1,4 @@
-import type { ModuloArgs_Build } from "../args/index.ts";
+import type { Modulo_Build_Args } from "../args/index.ts";
 import {
   is_env_external,
   type ExternalLibs,
@@ -7,7 +7,7 @@ import {
 } from "../config/externals.ts";
 import { is_string } from "../type/guard.ts";
 
-function get_external_url(args: ModuloArgs_Build, url: ConfigExternalUrl) {
+function get_external_url(args: Modulo_Build_Args, url: ConfigExternalUrl) {
   let _url = url;
   while (!is_string(_url)) {
     if (is_env_external(_url)) {
@@ -21,7 +21,7 @@ function get_external_url(args: ModuloArgs_Build, url: ConfigExternalUrl) {
 }
 
 export function get_externals_importmaps(
-  args: ModuloArgs_Build,
+  args: Modulo_Build_Args,
   external_list: ExternalLibs
 ) {
   return Object.entries(external_list).reduce(

@@ -13,3 +13,4 @@ export function exec() {
 }
 
 export { create_config } from "./config/merge-config.ts";
+export type { Modulo_Build_Args } from "./args/index.ts";

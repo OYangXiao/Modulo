@@ -4,10 +4,10 @@ import picocolors from "picocolors";
 import { get_global_config } from "../config/index.ts";
 import { debug_log } from "../tools/debug-log.ts";
 import { get_framework_name } from "../tools/get-framework-name.ts";
-import type { ModuloArgs_Build } from "../args/index.ts";
+import type { Modulo_Build_Args } from "../args/index.ts";
 
 export function collect_modules(
-  args: ModuloArgs_Build,
+  args: Modulo_Build_Args,
   kind: "page" | "module"
 ) {
   const global_config = get_global_config(args);

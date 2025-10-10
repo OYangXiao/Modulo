@@ -1,6 +1,6 @@
-import { create_config } from "@yannick-z/modulo";
+import { create_config, type Modulo_Build_Args } from "@yannick-z/modulo";
 
-export default (build_config: {}) => {
+export default (build_args: Modulo_Build_Args) => {
   return create_config({
     input: {
       src: "src",

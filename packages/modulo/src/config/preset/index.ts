@@ -3,7 +3,6 @@ import { preset_alias } from "./alias.ts";
 import { preset_dev_server_config } from "./dev-server.ts";
 import { preset_input_dirs, preset_output_dirs } from "./dirs.ts";
 import { default_html_config } from "./html.ts";
-import { preset_ui_libs } from "./libs.ts";
 import { preset_minify_config } from "./minify.ts";
 import { preset_url_config } from "./url.ts";
 import type { ExternalLibs } from "../externals.ts";
