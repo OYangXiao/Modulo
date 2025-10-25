@@ -1,4 +1,4 @@
-import { expect } from "./expect.ts";
+import { expect } from "../../tools/expect.ts";
 
 export function merge_user_config(target: any, input: any) {
   for (const key in input) {

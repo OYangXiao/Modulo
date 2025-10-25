@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import readline from "node:readline";
 import utils from "node:util";
 import picocolors from "picocolors";
-import type { Modulo_Init_Args } from "../args/index.ts";
+import type { Modulo_Init_Args } from "../cli/args/index.ts";
 import {
   default_config_file_name,
   get_example_config,

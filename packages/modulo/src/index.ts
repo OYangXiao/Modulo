@@ -1,5 +1,5 @@
-import { get_args } from "./args/index.ts";
-import { init_tool } from "./cli/init.ts";
+import { get_args } from "./cli/args/resolve.ts";
+import { init_tool } from "./cli/index.ts";
 import { build_code } from "./cli/build.ts";
 
 export function exec() {
@@ -12,5 +12,5 @@ export function exec() {
   }
 }
 
-export { create_config } from "./config/merge-config.ts";
-export type { Modulo_Build_Args } from "./args/index.ts";
+export { create_config } from "./build/config/merge-config.ts";
+export type { Modulo_Build_Args } from "./cli/args/resolve.ts";

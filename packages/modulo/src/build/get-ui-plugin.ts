@@ -1,9 +1,9 @@
 import { type PluginReactOptions, pluginReact } from "@rsbuild/plugin-react";
 import { type PluginVueOptions, pluginVue2 } from "@rsbuild/plugin-vue2";
-import { get_global_config, get_packagejson } from "../config/index.ts";
-import { get_framework_name } from "./get-framework-name.ts";
-import { expect } from "./expect.ts";
-import type { Modulo_Build_Args } from "../args/index.ts";
+import { get_global_config, get_packagejson } from "./config/index.ts";
+import { get_framework_name } from "../myself/root.ts";
+import { expect } from "../tools/expect.ts";
+import type { Modulo_Build_Args } from "../cli/args/resolve.ts";
 
 export function framework_plugin(
   args: Modulo_Build_Args,

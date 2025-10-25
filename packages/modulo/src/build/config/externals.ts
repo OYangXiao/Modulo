@@ -1,4 +1,4 @@
-import { is_record, is_string } from "../type/guard.ts";
+import { is_record, is_string } from "../../type/guard.ts";
 
 export interface UmdExternalUrl {
   umd: string;

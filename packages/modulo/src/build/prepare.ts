@@ -1,9 +1,9 @@
 import picocolors from "picocolors";
-import type { Modulo_Build_Args } from "../args/index.ts";
+import type { Modulo_Build_Args } from "../cli/args/resolve.ts";
 import { collect_modules } from "./collect-modules.ts";
-import { omit_root_path_for_entries } from "../tools/omit-root-path.ts";
+import { omit_root_path_for_entries } from "./omit-root-path.ts";
 import { get_externals_importmaps } from "./get-externals-and-tags.ts";
-import type { GLOBAL_CONFIG } from "../config/type.ts";
+import type { GLOBAL_CONFIG } from "./config/type.ts";
 
 let printed = false;
 

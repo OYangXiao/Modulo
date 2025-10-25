@@ -1,5 +1,5 @@
 import picocolors from "picocolors";
-import { star_line } from "../../initiate/modify-scripts.ts";
+import { star_line } from "../../initiator/modify-scripts.ts";
 import { preset_alias } from "../preset/alias.ts";
 import { preset_config } from "../preset/index.ts";
 import type { USER_CONFIG } from "../type.ts";

@@ -2,10 +2,10 @@ import { resolve } from "node:path";
 import { createRsbuild, defineConfig } from "@rsbuild/core";
 import { pluginLess } from "@rsbuild/plugin-less";
 import picocolors from "picocolors";
-import type { Modulo_Build_Args } from "../args/index.ts";
-import { get_global_config } from "../config/index.ts";
-import { get_package_root } from "../tools/find-path-root.ts";
-import { framework_plugin } from "../tools/get-ui-plugin.ts";
+import type { Modulo_Build_Args } from "../cli/args/resolve.ts";
+import { get_global_config } from "./config/index.ts";
+import { get_project_root } from "../project/pkg-json.ts";
+import { framework_plugin } from "./get-ui-plugin.ts";
 import { pluginUmd } from "@rsbuild/plugin-umd";
 import { prepare_config } from "./prepare.ts";
 
@@ -59,7 +59,7 @@ export async function build_page(args: Modulo_Build_Args) {
       tags: [importmaps_tag, ...config.html.tags],
       template:
         config.html.template ||
-        resolve(get_package_root(), "template/index.html"),
+        resolve(get_project_root(), "template/index.html"),
       templateParameters: {
         base_prefix: config.url.base,
       },

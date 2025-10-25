@@ -1,11 +1,13 @@
-import picocolors from 'picocolors';
+import { verbose } from "./verbose.ts";
 
-export function jsonparse<T>(input: string) {
-  try {
-    if (input) {
-      return JSON.parse(input) as T;
+export const json = {
+  parse<T>(input: string) {
+    try {
+      if (input) {
+        return JSON.parse(input) as T;
+      }
+    } catch (e) {
+      verbose.error(`JSON.parse failed\n${e}`);
     }
-  } catch (e) {
-    console.error(picocolors.red(`JSON.parse failed\n${e}`));
-  }
-}
+  },
+};

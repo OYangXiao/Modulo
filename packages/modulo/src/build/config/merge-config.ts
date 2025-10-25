@@ -1,17 +1,14 @@
 import { resolve } from "node:path";
-import { cwd } from "node:process";
-import type { Modulo_Build_Args } from "../args/index.ts";
-import { debug_log } from "../tools/debug-log.ts";
-import { resolve_and_read } from "../tools/file.ts";
-import { merge_user_config } from "../tools/merge-user-config.ts";
-import { expect } from "../tools/expect.ts";
+import type { Modulo_Build_Args } from "../../cli/args/resolve.ts";
+import { debug_log } from "../../tools/log-debug.ts";
+import { resolve_and_read_file } from "../../tools/file.ts";
+import { merge_user_config } from "./merge-user-config.ts";
+import { expect } from "../../tools/expect.ts";
 import { preset_config } from "./preset/index.ts";
 import { preset_minify_config } from "./preset/minify.ts";
 import type { GLOBAL_CONFIG, USER_CONFIG } from "./type.ts";
-/**
- * 命令启动时候的目录作为根目录
- */
-export const root = cwd();
+
+
 let global_config: GLOBAL_CONFIG;
 
 export const create_config = (config: USER_CONFIG) => config;
@@ -24,7 +21,7 @@ export async function merge_config(
 ): Promise<GLOBAL_CONFIG> {
   if (global_config) return global_config;
 
-  const user_config = await import(resolve_and_read(root, args.config)).then(
+  const user_config = await import(resolve_and_read_file(root, args.config)).then(
     (m) => m.default(args.env) as USER_CONFIG
   );
   expect(!user_config, "根目录下没有配置文件");

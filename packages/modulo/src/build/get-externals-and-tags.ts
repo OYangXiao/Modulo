@@ -1,10 +1,10 @@
-import type { Modulo_Build_Args } from "../args/index.ts";
+import type { Modulo_Build_Args } from "../cli/args/resolve.ts";
 import {
   is_env_external,
   type ExternalLibs,
   is_module_typed_external_url,
   type ConfigExternalUrl,
-} from "../config/externals.ts";
+} from "./config/externals.ts";
 import { is_string } from "../type/guard.ts";
 
 function get_external_url(args: Modulo_Build_Args, url: ConfigExternalUrl) {

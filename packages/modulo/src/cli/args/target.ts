@@ -1,6 +1,5 @@
 import type minimist from "minimist";
-import { expect } from "../tools/expect.ts";
-import type { Modulo_Init_Cmd, Modulo_Build_Cmd } from "./cmd.ts";
+import { expect } from "../../tools/expect.ts";
 
 const build_options = {
   page: "构建页面",
@@ -19,9 +18,6 @@ const options = {
   },
   init: init_options,
 };
-
-export type Modulo_Build_Target = keyof typeof build_options;
-export type Modulo_Init_Target = keyof typeof init_options;
 
 export function get_cmd_target<T extends Modulo_Build_Cmd | Modulo_Init_Cmd>(
   argv: minimist.ParsedArgs,

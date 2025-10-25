@@ -1,18 +1,29 @@
 import { exit } from "node:process";
-import pc from "picocolors";
+import { verbose } from "./verbose.ts";
 
 const alert_str = "! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !";
 const defaultMessage = "SOMETHING'S WRONG";
 
-export function expect(condition: boolean) {
-  function alert(msg = defaultMessage) {
-    if (condition) return true;
-    console.log(pc.bgRed(pc.white(`\n${alert_str}\n\n${msg}\n\n${alert_str}`)), "\n");
+export function expect(condition: any) {
+  function or_halt(msg = defaultMessage) {
+    if (!condition) {
+      verbose.warn(`\n${alert_str}\n\n${msg}\n\n${alert_str}`);
+      exit(1);
+    }
   }
+
+  function or_throw(msg = defaultMessage) {
+    if (!condition) {
+      throw new Error(msg);
+    }
+  }
+
   return {
-    alert,
-    halt: (msg = defaultMessage) => {
-      if (!alert(msg)) exit(1);
+    verbose: (msg: string) => {
+      verbose.info(msg);
+      return { or_halt, or_throw };
     },
+    or_halt,
+    or_throw,
   };
 }

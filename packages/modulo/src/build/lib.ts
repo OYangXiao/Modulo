@@ -1,9 +1,9 @@
 import { pluginLess } from "@rsbuild/plugin-less";
 import { build, defineConfig } from "@rslib/core";
 import picocolors from "picocolors";
-import type { Modulo_Build_Args } from "../args/index.ts";
-import { get_global_config, get_packagejson } from "../config/index.ts";
-import { framework_plugin } from "../tools/get-ui-plugin.ts";
+import type { Modulo_Build_Args } from "../cli/args/resolve.ts";
+import { get_global_config, get_packagejson } from "./config/index.ts";
+import { framework_plugin } from "./get-ui-plugin.ts";
 import { prepare_config } from "./prepare.ts";
 
 export async function build_lib(args: Modulo_Build_Args) {
