@@ -21,6 +21,7 @@
     "@rslib/core": "0.13.1",
     "@types/node": "^22.18.0",
     "@types/semver": "^7.7.1",
+    "cac": "^6.7.14",
     "minimist": "^1.2.8",
     "picocolors": "^1.1.1",
     "semver": "^7.7.2",

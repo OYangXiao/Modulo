@@ -27,3 +27,30 @@ export function get_package_root() {
 
   return packageRoot;
 }
+
+export function find_workspace_root(cwd: string) {
+  let currentDir = path.resolve(cwd);
+  const root = path.parse(currentDir).root;
+
+  while (currentDir !== root) {
+    const pnpmWorkspace = path.join(currentDir, "pnpm-workspace.yaml");
+    const packageJsonPath = path.join(currentDir, "package.json");
+
+    if (fs.existsSync(pnpmWorkspace)) {
+      return currentDir;
+    }
+
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+        if (pkg.workspaces) {
+          return currentDir;
+        }
+      } catch {}
+    }
+
+    currentDir = path.dirname(currentDir);
+  }
+
+  return undefined;
+}

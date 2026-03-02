@@ -18,8 +18,8 @@ export function get_preset_for_init(argv: minimist.ParsedArgs) {
 
   preset &&
     PANIC_IF(
-      preset !== "react17" && preset !== "vue2",
-      "目前只支持react17和vue2"
+      preset !== "react17" && preset !== "react19" && preset !== "vue2",
+      "目前只支持react17, react19和vue2"
     );
 
   return preset;

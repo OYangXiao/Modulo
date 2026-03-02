@@ -6,6 +6,13 @@ import { get_global_config, get_packagejson } from "../config/index.ts";
 import { framework_plugin } from "../tools/get-ui-plugin.ts";
 import { prepare_config } from "./prepare.ts";
 
+/**
+ * 执行库（module）打包
+ * 
+ * 使用 Rslib 将模块目录下的代码打包为 ESM 和 UMD 格式。
+ * 
+ * @param args CLI 参数
+ */
 export async function lib_pack(args: ModuloArgs_Pack) {
   const config = get_global_config(args);
   const packagejson = get_packagejson();
