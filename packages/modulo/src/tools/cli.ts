@@ -7,15 +7,15 @@ import picocolors from "picocolors";
  * @returns Promise<boolean> 用户是否确认 (Y/y 为 true)
  */
 export async function confirm(message: string): Promise<boolean> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	});
 
-  return new Promise((resolve) => {
-    rl.question(`${picocolors.yellow(message)} (Y/n) `, (answer) => {
-      rl.close();
-      resolve(answer.toLowerCase() === "y" || answer === "");
-    });
-  });
+	return new Promise((resolve) => {
+		rl.question(`${picocolors.yellow(message)} (Y/n) `, (answer) => {
+			rl.close();
+			resolve(answer.toLowerCase() === "y" || answer === "");
+		});
+	});
 }

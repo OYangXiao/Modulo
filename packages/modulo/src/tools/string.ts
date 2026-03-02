@@ -4,8 +4,8 @@
  * @returns 格式化后的字符串
  */
 export function capitalize(str: string): string {
-  if (!str) return "";
-  return `${str.charAt(0).toUpperCase()}${str.slice(1).toLowerCase()}`;
+	if (!str) return "";
+	return `${str.charAt(0).toUpperCase()}${str.slice(1).toLowerCase()}`;
 }
 
 /**
