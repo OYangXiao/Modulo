@@ -1,5 +1,5 @@
 import { pluginLess } from "@rsbuild/plugin-less";
-import { build, defineConfig } from "@rslib/core";
+import rslib from "@rslib/core";
 import picocolors from "picocolors";
 import type { ModuloArgs_Pack } from "../args/index.ts";
 import { get_global_config, get_packagejson } from "../config/index.ts";
@@ -23,12 +23,12 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 		return;
 	}
 
-	const rslibConfig = defineConfig({
+	const rslibConfig = rslib.defineConfig({
 		source: {
 			define: config.define,
 			entry: entries,
 		},
-		plugins: [framework_plugin(args, config), pluginLess()],
+		plugins: [framework_plugin(config), pluginLess()],
 		resolve: {
 			alias: config.alias,
 		},
@@ -73,9 +73,9 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 		performance: {
 			bundleAnalyze: config.analyze
 				? {
-						analyzerMode: "disabled",
-						generateStatsFile: true,
-					}
+					analyzerMode: "disabled",
+					generateStatsFile: true,
+				}
 				: undefined,
 			chunkSplit: {
 				strategy: "all-in-one",
@@ -83,7 +83,8 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 		},
 	});
 
-	await build(rslibConfig, { watch: args.cmd === "build" && args.pack.watch });
+	const { build } = await rslib.createRslib({ config: rslibConfig });
+	await build({ watch: args.cmd === "build" && args.pack.watch });
 
 	if (args.cmd === "build") {
 		console.log(picocolors.green("\n**** 构建【module】完成 ****\n"));

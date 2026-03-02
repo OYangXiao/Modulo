@@ -6,6 +6,7 @@
 	"main": "./src/index.ts",
 	"author": "oyangxiao",
 	"scripts": {
+		"build": "直接使用ts执行，所以不需要build",
 		"lint": "biome lint .",
 		"format": "biome format --write .",
 		"check": "biome check --write ."

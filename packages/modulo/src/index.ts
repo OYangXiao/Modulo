@@ -90,8 +90,10 @@ cli
 		});
 	});
 
+import packagejson from "../package.json" with { type: "json" };
+
 cli.help();
-cli.version("0.2.0");
+cli.version(packagejson.version);
 
 export function exec() {
 	try {
