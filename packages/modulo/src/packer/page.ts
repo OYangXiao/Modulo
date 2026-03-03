@@ -39,14 +39,13 @@ export async function page_pack(args: ModuloArgs_Pack) {
 		tools: {
 			rspack: {
 				experiments: {
-					outputModule: true,
+					outputModule: config.externalsType === "importmap" ? true : undefined,
 				},
 				plugins: [
 					// @ts-ignore Rspack 插件类型兼容问题
 					new AutoExternalPlugin(args, config),
 				],
 			},
-			htmlPlugin: true,
 		},
 		output: {
 			assetPrefix: config.url.cdn || config.url.base,
@@ -61,7 +60,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
 		html: {
 			meta: config.html.meta,
 			mountId: config.html.root,
-			scriptLoading: "module",
+			scriptLoading: config.externalsType === "importmap" ? undefined : "module",
 			tags: config.html.tags,
 			template:
 				config.html.template ||

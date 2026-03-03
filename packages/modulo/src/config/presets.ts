@@ -10,7 +10,7 @@ export const preset_dev_server_config = {
 	port: 8080, // 开发页面时, dev-server服务器端口
 	proxy: {} as Record<
 		string,
-		string | { target: string; pathRewrite?: Record<string, string> }
+		string | { target: string; pathRewrite?: Record<string, string>; changeOrigin?: boolean; secure?: boolean }
 	>, // dev时的代理配置
 };
 export type DEV_SERVER_CONFIG = typeof preset_dev_server_config;

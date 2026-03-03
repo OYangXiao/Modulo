@@ -1,5 +1,5 @@
 import { pluginLess } from "@rsbuild/plugin-less";
-import rslib from "@rslib/core";
+import * as rslib from "@rslib/core";
 import picocolors from "picocolors";
 import type { ModuloArgs_Pack } from "../args/index.ts";
 import { get_global_config, get_packagejson } from "../config/index.ts";

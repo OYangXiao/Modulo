@@ -39,17 +39,21 @@ export function getExternalsAndImportMap(
 	return Object.entries(externalLibs).reduce(
 		({ externals, importMap }, [libName, data]) => {
 			// 归一化为GlobalExternal或者ImportExternal
-			const externalData = is_env_external(data) ? data[args.pack.env] : data;
-
+			// 1. data 是 string -> { url: data }
+			// 2. data 是 EnvExternalUrl (dev/prd) -> { url: data }
+			// 3. data 是 ImportExternal -> data
+			
 			let externalLib: ImportExternal;
-
-			if (typeof externalData === "string") {
-				externalLib = { url: externalData };
+			
+			if (is_string(data)) {
+				externalLib = { url: data };
+			} else if (is_env_external(data)) {
+				externalLib = { url: data };
 			} else {
-				// 此时 externalData 已经是 ImportExternal 类型
-				externalLib = externalData as ImportExternal;
+				externalLib = data as ImportExternal;
 			}
-
+			
+			// 解析 url (处理 EnvExternalUrl)
 			const url = getExternalUrl(args, externalLib.url);
 
 			if (externalsType === "script") {
