@@ -139,7 +139,7 @@ export async function get_global_config(
 		/**
 		 * dist目录
 		 */
-		const dist = resolve(root, _config.output.dist);
+		const dist = resolve(root, _config.output.distPath);
 		const output = {
 			..._config.output,
 			dist: dist,

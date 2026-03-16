@@ -50,7 +50,7 @@ export async function page_pack(args: ModuloArgs_Pack) {
 		output: {
 			assetPrefix: config.url.cdn || config.url.base,
 			distPath: {
-				root: config.output.dist,
+				root: config.output.distPath,
 			},
 			externals,
 			filenameHash: config.output.filenameHash,

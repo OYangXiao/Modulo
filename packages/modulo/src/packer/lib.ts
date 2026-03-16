@@ -1,5 +1,5 @@
 import { pluginLess } from "@rsbuild/plugin-less";
-import * as rslib from "@rslib/core";
+import { rsbuild, defineConfig, createRslib } from "@rslib/core";
 import picocolors from "picocolors";
 import type { ModuloArgs_Pack } from "../args/index.ts";
 import { get_global_config, get_packagejson } from "../config/index.ts";
@@ -23,7 +23,8 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 		return;
 	}
 
-	const rslibConfig = rslib.defineConfig({
+	const rslibConfig = defineConfig({
+		root: process.cwd(),
 		source: {
 			define: config.define,
 			entry: entries,
@@ -83,8 +84,10 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 		},
 	});
 
-	const { build } = await rslib.createRslib({ config: rslibConfig });
-	await build({ watch: args.cmd === "build" && args.pack.watch });
+	const rslibInstance = await createRslib({ config: rslibConfig })
+	await rslibInstance.build({
+		watch: args.cmd === "build" && !!args.pack.watch,
+	});
 
 	if (args.cmd === "build") {
 		console.log(picocolors.green("\n**** 构建【module】完成 ****\n"));

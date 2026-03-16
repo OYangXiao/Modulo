@@ -2,24 +2,34 @@
 	"name": "@yannick-z/modulo",
 	"description": "",
 	"type": "module",
-	"version": "0.3.1",
-	"main": "./src/index.ts",
+	"version": "0.3.7",
+	"main": "./dist/index.js",
+	"types": "./types/src/index.d.ts",
 	"author": "oyangxiao",
 	"scripts": {
-		"build": "直接使用ts执行，所以不需要build",
-		"lint": "biome lint .",
-		"format": "biome format --write .",
-		"check": "biome check --write ."
+		"build": "rslib build && tsc --emitDeclarationOnly",
+		"lint": "biome lint src bin rslib.config.ts",
+		"format": "biome format --write src bin rslib.config.ts package.json biome.json",
+		"check": "biome check --write src bin rslib.config.ts package.json biome.json"
 	},
 	"bin": {
-		"modulo": "./bin/modulo.js"
+		"modulo": "./dist/bin/modulo.js"
 	},
+	"files": [
+		"dist",
+		"bin",
+		"src",
+		"template",
+		"README.md",
+		"LICENSE"
+	],
 	"dependencies": {
 		"@rsbuild/core": "^1.7.3",
 		"@rsbuild/plugin-less": "^1.6.0",
 		"@rsbuild/plugin-react": "^1.4.5",
 		"@rsbuild/plugin-vue2": "^1.1.0",
 		"@rslib/core": "^0.19.6",
+		"@types/minimist": "^1.2.5",
 		"@types/node": "^24.0.0",
 		"cac": "^6.7.14",
 		"picocolors": "^1.1.1",

@@ -1,5 +1,4 @@
 import { createRequire } from 'node:module';
-import type { Compiler, Compilation } from "@rspack/core";
 const require = createRequire(import.meta.url);
 import type { ModuloArgs_Pack } from "../args/index.ts";
 import type { GLOBAL_CONFIG } from "../config/type.ts";
@@ -25,12 +24,12 @@ export class AutoExternalPlugin {
 		this.usedExternals = new Set<string>();
 	}
 
-	apply(compiler: Compiler) {
+	apply(compiler: any) {
 		compiler.hooks.compilation.tap(
 			"AutoExternalPlugin",
-			(compilation: Compilation) => {
+			(compilation: any) => {
 				// 1. 扫描模块依赖
-				compilation.hooks.finishModules.tap("AutoExternalPlugin", (modules) => {
+				compilation.hooks.finishModules.tap("AutoExternalPlugin", (modules: any[]) => {
 					// ... (省略模块扫描逻辑，这里没有问题) ...
 					for (const module of modules) {
 						// @ts-ignore
@@ -86,7 +85,7 @@ export class AutoExternalPlugin {
 				// 或者我们可以尝试直接使用 tapAsync 到 HtmlWebpackPlugin 的实例上，如果我们能找到它
 
 				// 终极 Hook 调试: 使用 compiler.hooks.emit 来检查 assets，看是否包含 index.html，以及内容
-				compiler.hooks.emit.tapAsync("AutoExternalPlugin", (compilation, cb) => {
+				compiler.hooks.emit.tapAsync("AutoExternalPlugin", (compilation: any, cb: any) => {
 					if (process.env.DEBUG) console.log('[AutoExternalPlugin] emit hook triggered');
 					// 检查 compilation.assets
 					const assetNames = Object.keys(compilation.assets);

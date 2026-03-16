@@ -7,7 +7,6 @@ import {
 import {
 	is_env_external,
 	is_string,
-	is_import_external,
 } from "../type/guard.ts";
 
 function getExternalUrl(args: ModuloArgs_Pack, url: ConfigExternalUrl) {
@@ -61,7 +60,9 @@ export function getExternalsAndImportMap(
 				const globalVar = externalLib.global || libName;
 				const importName = externalLib.importName || libName;
 				(Array.isArray(importName) ? importName : [importName]).forEach(
-					(name) => (externals[name] = globalVar),
+					(name) => {
+						externals[name] = globalVar;
+					},
 				);
 
 				if (url) {
@@ -71,7 +72,9 @@ export function getExternalsAndImportMap(
 				// Importmap 模式：external 映射为包名（由 importmap 解析）
 				const importName = externalLib.importName || libName;
 				(Array.isArray(importName) ? importName : [importName]).forEach(
-					(name) => (externals[name] = libName),
+					(name) => {
+						externals[name] = libName;
+					},
 				);
 
 				if (url) {

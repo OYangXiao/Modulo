@@ -22,7 +22,7 @@ export const preset_input_dirs = {
 };
 
 export const preset_output_dirs = {
-	dist: "dist", // 源码目录
+	distPath: "dist", // 源码目录
 	pages: "", // 页面目录输出目录，默认使用dist/..
 	modules: "modules", // 组件输出目录，默认使用dist/modules/..
 	filenameHash: true,
