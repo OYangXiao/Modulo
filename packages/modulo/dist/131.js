@@ -27,7 +27,7 @@ const logger = {
     }
 };
 var package_namespaceObject = {
-    rE: "0.3.6"
+    rE: "0.3.8"
 };
 const cli = cac("modulo");
 cli.command("init <target>", "Initialize modulo configuration or scripts").option("-f, --force", "Force overwrite existing files").option("--path <path>", "Specify the path to initialize").option("--preset <preset>", "Specify the preset to use").action((target, options)=>{

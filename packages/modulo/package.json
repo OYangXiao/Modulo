@@ -2,7 +2,7 @@
 	"name": "@yannick-z/modulo",
 	"description": "",
 	"type": "module",
-	"version": "0.3.7",
+	"version": "0.3.8",
 	"main": "./dist/index.js",
 	"types": "./types/src/index.d.ts",
 	"author": "oyangxiao",
@@ -19,6 +19,7 @@
 		"dist",
 		"bin",
 		"src",
+		"types",
 		"template",
 		"README.md",
 		"LICENSE"
