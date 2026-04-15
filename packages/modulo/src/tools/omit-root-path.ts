@@ -14,8 +14,13 @@ export function omit_root_path(path: string): string {
 /**
  * 批量处理入口文件路径
  */
-export function omit_root_path_for_entries(entries: Record<string, string>) {
+export function omit_root_path_for_entries(
+	entries: Record<string, { entry_dir: string; entry: string; }>,
+) {
 	return Object.fromEntries(
-		Object.entries(entries).map(([key, value]) => [key, omit_root_path(value)]),
+		Object.entries(entries).map(([key, value]) => [
+			key,
+			{...value, entry_dir: omit_root_path(value.entry_dir), entry: omit_root_path(value.entry), },
+		]),
 	);
 }

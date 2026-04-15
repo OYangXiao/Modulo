@@ -7,13 +7,13 @@ import type { GLOBAL_CONFIG } from "../config/type.ts";
 
 let printed = false;
 
-export function prepare_config(
+export async function prepare_config(
 	args: ModuloArgs_Pack,
 	kind: "page" | "module",
 	config: GLOBAL_CONFIG,
 ) {
 	console.log(picocolors.blueBright(`\n**** 开始构建 【${kind}】 ****`));
-	const entries = collect_modules(args, kind, config);
+	const entries = await collect_modules(args, kind, config);
 
 	if (!entries) {
 		console.log(picocolors.red(`\n没有要构建的${kind}，跳过\n`));

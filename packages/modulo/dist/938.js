@@ -286,4 +286,4 @@ async function get_global_config(args) {
     }
     return global_config;
 }
-export { PANIC_IF, exists, fileURLToPath, find_entry_file, get_directories, get_global_config, get_packagejson, preset_alias, preset_config, update_json_file };
+export { PANIC_IF, exists, fileURLToPath, find_entry_file, get_directories, get_global_config, get_packagejson, pathToFileURL, preset_alias, preset_config, update_json_file };

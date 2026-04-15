@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { createRsbuild, defineConfig } from "@rsbuild/core";
+import { createRsbuild, defineConfig, RsbuildConfig } from "@rsbuild/core";
 import { pluginLess } from "@rsbuild/plugin-less";
 import picocolors from "picocolors";
 import type { ModuloArgs_Pack } from "../args/index.ts";
@@ -22,18 +22,22 @@ import { AutoExternalPlugin } from "./auto-external-plugin.ts";
 export async function page_pack(args: ModuloArgs_Pack) {
 	const config = await get_global_config(args);
 
-	const { entries, externals } = prepare_config(args, "page", config);
+	const { entries, externals } = await prepare_config(args, "page", config);
 
 	if (!entries) {
 		return;
 	}
 
 	const workspaceRoot = find_workspace_root(process.cwd());
+	const get_entry_html_config = (entryName: string) => {
+		const raw = entries[entryName]?.html_config as RsbuildConfig['html'];
+		return typeof raw === "object"? raw : {};
+	};
 
 	const rsbuildConfig = defineConfig({
 		source: {
 			define: config.define,
-			entry: entries,
+			entry: Object.fromEntries(Object.entries(entries).map(([key, entry]) => [key, entry.entry])),
 		},
 		plugins: [framework_plugin(config), pluginLess()],
 		tools: {
@@ -58,17 +62,56 @@ export async function page_pack(args: ModuloArgs_Pack) {
 			minify: config.minify,
 		},
 		html: {
-			meta: config.html.meta,
+			meta({ value, entryName }) {
+				const entryHtml = get_entry_html_config(entryName);
+				const merged: any = { ...value };
+				for (const [key, val] of [...Object.entries(config.html.meta || {}), ...Object.entries(entryHtml.meta || {})]) {
+					if (val !== undefined) {
+						merged[key] = val;
+					}
+				}
+				return merged as any;
+			},
+			title({ entryName }) {
+				const entryHtml = get_entry_html_config(entryName);
+				return entryHtml.title as string  || config.html.title || "";
+			},
 			mountId: config.html.root,
 			scriptLoading: config.externalsType === "importmap" ? undefined : "module",
-			tags: config.html.tags,
-			template:
-				config.html.template ||
-				resolve(get_package_root(), "template/index.html"),
-			templateParameters: {
-				base_prefix: config.url.base,
+			tags: [
+				...(config.html.tags || []),
+				(tags: any[], utils: { entryName: string }) => {
+					const entryHtml = get_entry_html_config(utils.entryName);
+					const entryTags = "tags" in entryHtml ? entryHtml.tags : undefined;
+					if (Array.isArray(entryTags)) {
+						return [...tags, ...entryTags] as any;
+					}
+					if (entryTags && typeof entryTags === "object") {
+						return [...tags, entryTags] as any;
+					}
+				},
+			] as any,
+			template({ entryName }) {
+				const entryHtml = get_entry_html_config(entryName);
+				const entry_dir = entries[entryName].entry_dir;
+
+				let template = entryHtml.template
+				// 检查是否是相对路径
+				if(typeof template === "string" &&template.startsWith('.')){
+					// 将其转换为相对配置文件的路径
+					template = resolve(entry_dir, template);
+				}
+				return entryHtml.template as string || config.html.template || resolve(get_package_root(), "template/index.html");
 			},
-			title: config.html.title,
+			templateParameters(defaultValue, { entryName }) {
+				const entryHtml = get_entry_html_config(entryName);
+				const entryParams = entryHtml.templateParameters || undefined;
+				return {
+					...defaultValue,
+					base_prefix: config.url.base,
+					...entryParams,
+				};
+			},
 		},
 		resolve: {
 			alias: config.alias,

@@ -3,9 +3,11 @@ import { createRslib, defineConfig } from "@rslib/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { pluginVue2 } from "@rsbuild/plugin-vue2";
 import semver from "semver";
+import { readFile } from "node:fs/promises";
+import typescript from "typescript";
 import { createRsbuild, defineConfig as core_defineConfig } from "@rsbuild/core";
 import { createRequire } from "node:module";
-import { get_directories, exists, fileURLToPath, get_packagejson, get_global_config, PANIC_IF, find_entry_file } from "./938.js";
+import { fileURLToPath, exists, get_packagejson, pathToFileURL, find_entry_file, get_directories, get_global_config, PANIC_IF } from "./938.js";
 import { debug_log, node_path, relative, node_fs, dirname, resolve, picocolors } from "./131.js";
 function get_framework_name() {
     const { dependencies } = get_packagejson();
@@ -27,7 +29,36 @@ function framework_plugin(global_config, options) {
     PANIC_IF(!is_valid, `package.json中只允许使用固定版本号, 并且只支持vue-2.7.16, react-19.2.4 (当前版本: ${version})`);
     return "vue" === framework_name ? pluginVue2(options) : pluginReact(options);
 }
-function collect_modules(args, kind, global_config) {
+async function load_html_config(dir_path) {
+    const json_path = resolve(dir_path, "html.json");
+    if (exists(json_path)) {
+        const content = await readFile(json_path, "utf8");
+        const data = JSON.parse(content);
+        return data && "object" == typeof data ? data : {};
+    }
+    const js_path = resolve(dir_path, "html.js");
+    if (exists(js_path)) {
+        const mod = await import(`${pathToFileURL(js_path).href}?t=${Date.now()}`);
+        const data = mod && "object" == typeof mod && "default" in mod ? mod.default : mod;
+        return data && "object" == typeof data ? data : {};
+    }
+    const ts_path = resolve(dir_path, "html.ts");
+    if (exists(ts_path)) {
+        const source = await readFile(ts_path, "utf8");
+        const { outputText } = typescript.transpileModule(source, {
+            compilerOptions: {
+                target: typescript.ScriptTarget.ES2020,
+                module: typescript.ModuleKind.ESNext
+            },
+            fileName: ts_path
+        });
+        const mod = await import(`data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`);
+        const data = mod && "object" == typeof mod && "default" in mod ? mod.default : mod;
+        return data && "object" == typeof data ? data : {};
+    }
+    return {};
+}
+async function collect_modules(args, kind, global_config) {
     const framework_name = get_framework_name();
     const module_path = global_config.input[`${kind}s`];
     const isExist = exists(module_path);
@@ -44,7 +75,7 @@ function collect_modules(args, kind, global_config) {
         ".jsx"
     ];
     if ("vue" === framework_name) extensions.unshift(".vue");
-    const module_entries = get_directories(module_path).map((dirName)=>{
+    const module_entries = await Promise.all(get_directories(module_path).map(async (dirName)=>{
         const dir_path = resolve(module_path, dirName);
         const candidates = [
             ...baseCandidates,
@@ -52,12 +83,19 @@ function collect_modules(args, kind, global_config) {
         ];
         const entry_file_path = find_entry_file(dir_path, candidates, extensions);
         debug_log("found entry", dirName, entry_file_path || "NOT FOUND");
+        let html_content = {};
+        if (entry_file_path) html_content = await load_html_config(dir_path);
         return [
             dirName,
-            entry_file_path
+            {
+                entry_dir: dir_path,
+                entry: entry_file_path,
+                html_config: html_content
+            }
         ];
-    }).filter((entry)=>!!entry[1]);
-    return module_entries.length > 0 ? Object.fromEntries(module_entries) : void 0;
+    }));
+    const valid_entries = module_entries.filter((entry)=>!!entry[1].entry);
+    return valid_entries.length > 0 ? Object.fromEntries(valid_entries) : void 0;
 }
 function omit_root_path(path) {
     const rel = relative(process.cwd(), path);
@@ -66,7 +104,11 @@ function omit_root_path(path) {
 function omit_root_path_for_entries(entries) {
     return Object.fromEntries(Object.entries(entries).map(([key, value])=>[
             key,
-            omit_root_path(value)
+            {
+                ...value,
+                entry_dir: omit_root_path(value.entry_dir),
+                entry: omit_root_path(value.entry)
+            }
         ]));
 }
 function is_string(data) {
@@ -121,9 +163,9 @@ function getExternalsAndImportMap(args, externalLibs, externalsType = "importmap
     });
 }
 let printed = false;
-function prepare_config(args, kind, config) {
+async function prepare_config(args, kind, config) {
     console.log(picocolors.blueBright(`\n**** 开始构建 【${kind}】 ****`));
-    const entries = collect_modules(args, kind, config);
+    const entries = await collect_modules(args, kind, config);
     if (entries) console.log(`${picocolors.blue(`\n${kind} entries:`)}\n${JSON.stringify(omit_root_path_for_entries(entries), null, 2)}\n`);
     else console.log(picocolors.red(`\n没有要构建的${kind}，跳过\n`));
     const { externals, importMap } = getExternalsAndImportMap(args, config.externals, config.externalsType);
@@ -160,13 +202,16 @@ function prepare_config(args, kind, config) {
 async function lib_pack(args) {
     const config = await get_global_config(args);
     const packagejson = get_packagejson();
-    const { entries, externals } = prepare_config(args, "module", config);
+    const { entries, externals } = await prepare_config(args, "module", config);
     if (!entries) return;
     const rslibConfig = defineConfig({
         root: process.cwd(),
         source: {
             define: config.define,
-            entry: entries
+            entry: Object.fromEntries(Object.entries(entries).map(([key, entry])=>[
+                    key,
+                    entry.entry
+                ]))
         },
         plugins: [
             framework_plugin(config),
@@ -351,13 +396,20 @@ class AutoExternalPlugin {
 }
 async function page_pack(args) {
     const config = await get_global_config(args);
-    const { entries, externals } = prepare_config(args, "page", config);
+    const { entries, externals } = await prepare_config(args, "page", config);
     if (!entries) return;
     const workspaceRoot = find_workspace_root(process.cwd());
+    const get_entry_html_config = (entryName)=>{
+        const raw = entries[entryName]?.html_config;
+        return "object" == typeof raw ? raw : {};
+    };
     const rsbuildConfig = core_defineConfig({
         source: {
             define: config.define,
-            entry: entries
+            entry: Object.fromEntries(Object.entries(entries).map(([key, entry])=>[
+                    key,
+                    entry.entry
+                ]))
         },
         plugins: [
             framework_plugin(config),
@@ -384,15 +436,54 @@ async function page_pack(args) {
             minify: config.minify
         },
         html: {
-            meta: config.html.meta,
+            meta ({ value, entryName }) {
+                const entryHtml = get_entry_html_config(entryName);
+                const merged = {
+                    ...value
+                };
+                for (const [key, val] of [
+                    ...Object.entries(config.html.meta || {}),
+                    ...Object.entries(entryHtml.meta || {})
+                ])if (void 0 !== val) merged[key] = val;
+                return merged;
+            },
+            title ({ entryName }) {
+                const entryHtml = get_entry_html_config(entryName);
+                return entryHtml.title || config.html.title || "";
+            },
             mountId: config.html.root,
             scriptLoading: "importmap" === config.externalsType ? void 0 : "module",
-            tags: config.html.tags,
-            template: config.html.template || resolve(get_package_root(), "template/index.html"),
-            templateParameters: {
-                base_prefix: config.url.base
+            tags: [
+                ...config.html.tags || [],
+                (tags, utils)=>{
+                    const entryHtml = get_entry_html_config(utils.entryName);
+                    const entryTags = "tags" in entryHtml ? entryHtml.tags : void 0;
+                    if (Array.isArray(entryTags)) return [
+                        ...tags,
+                        ...entryTags
+                    ];
+                    if (entryTags && "object" == typeof entryTags) return [
+                        ...tags,
+                        entryTags
+                    ];
+                }
+            ],
+            template ({ entryName }) {
+                const entryHtml = get_entry_html_config(entryName);
+                const entry_dir = entries[entryName].entry_dir;
+                let template = entryHtml.template;
+                if ("string" == typeof template && template.startsWith('.')) template = resolve(entry_dir, template);
+                return entryHtml.template || config.html.template || resolve(get_package_root(), "template/index.html");
             },
-            title: config.html.title
+            templateParameters (defaultValue, { entryName }) {
+                const entryHtml = get_entry_html_config(entryName);
+                const entryParams = entryHtml.templateParameters || void 0;
+                return {
+                    ...defaultValue,
+                    base_prefix: config.url.base,
+                    ...entryParams
+                };
+            }
         },
         resolve: {
             alias: config.alias

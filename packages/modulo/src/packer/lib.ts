@@ -17,7 +17,7 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 	const config = await get_global_config(args);
 	const packagejson = get_packagejson();
 
-	const { entries, externals } = prepare_config(args, "module", config);
+	const { entries, externals } = await prepare_config(args, "module", config);
 
 	if (!entries) {
 		return;
@@ -27,7 +27,9 @@ export async function lib_pack(args: ModuloArgs_Pack) {
 		root: process.cwd(),
 		source: {
 			define: config.define,
-			entry: entries,
+			entry: Object.fromEntries(
+				Object.entries(entries).map(([key, entry]) => [key, entry.entry]),
+			),
 		},
 		plugins: [framework_plugin(config), pluginLess()],
 		resolve: {
