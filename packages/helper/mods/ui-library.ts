@@ -1,5 +1,5 @@
-import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileExists, findNearestFileUp, readJsonFile } from '@yannick-z/modulo-common';
 import semver from 'semver';
 
 /**
@@ -12,41 +12,8 @@ function parseSemver(version: string): semver.SemVer | null {
   return semver.parse(version);
 }
 
-/**
- * 判断文件是否存在。
- */
-async function fileExists(filePath: string): Promise<boolean> {
-  try {
-    await access(filePath);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * 从 startCwd 向上查找最近的 package.json 路径。
- *
- * 用于支持在子目录（例如 packages/foo 或 src）中执行命令时，仍能定位到项目根或包根。
- */
 async function findNearestPackageJsonPath(startCwd: string): Promise<string> {
-  let current = path.resolve(startCwd);
-  while (true) {
-    const candidate = path.join(current, 'package.json');
-    if (await fileExists(candidate)) return candidate;
-    const parent = path.dirname(current);
-    if (parent === current) break;
-    current = parent;
-  }
-  throw new Error(`未找到 package.json（从 ${startCwd} 向上查找失败）`);
-}
-
-/**
- * 读取并解析 JSON 文件。
- */
-async function readJsonFile<T>(filePath: string): Promise<T> {
-  const raw = await readFile(filePath, 'utf8');
-  return JSON.parse(raw) as T;
+  return findNearestFileUp(startCwd, 'package.json');
 }
 
 type PackageJson = {

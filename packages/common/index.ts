@@ -25,3 +25,20 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
  * 作为默认回调或占位实现使用的空函数。
  */
 export function noop(): void {}
+
+export {
+  type AliasConfig,
+  createDefaultUserConfig,
+  DEFAULT_CONFIG_FILE_NAME,
+  type DevServerConfig,
+  type ExternalsType,
+  type HtmlConfig,
+  type InputConfig,
+  type OutputConfig,
+  type UrlConfig,
+  type UserConfig,
+} from './modulo-config.ts';
+
+export { formatError, formatOk, formatTitle, formatWarn, hr } from './utils/cli-format.ts';
+
+export { fileExists, findNearestFileUp, readJsonFile } from './utils/fs.ts';

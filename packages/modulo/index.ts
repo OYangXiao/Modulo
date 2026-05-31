@@ -5,10 +5,22 @@
  * 目前仅搭建对外 API 形态，具体 CLI 命令与参数体系后续逐步实现。
  */
 
+import type { UserConfig } from '@yannick-z/modulo-common';
+
 export type { Builder, BuilderCommand, BuilderContext } from '@yannick-z/modulo-builder';
 export { createBuilder } from '@yannick-z/modulo-builder';
-export type { MaybePromise } from '@yannick-z/modulo-common';
-export { assertNever, isRecord, noop } from '@yannick-z/modulo-common';
+export type {
+  AliasConfig,
+  DevServerConfig,
+  ExternalsType,
+  HtmlConfig,
+  InputConfig,
+  MaybePromise,
+  OutputConfig,
+  UrlConfig,
+  UserConfig,
+} from '@yannick-z/modulo-common';
+export { assertNever, createDefaultUserConfig, isRecord, noop } from '@yannick-z/modulo-common';
 export type {
   EnvironmentInfo,
   InitProjectOptions,
@@ -31,6 +43,13 @@ export {
 export interface ModuloCliOptions {
   cwd?: string;
   argv?: string[];
+}
+
+/**
+ * 读取用户 modulo 配置并且合并到默认配置中，同时用于限制配置项的ts类型。
+ */
+export function defineConfig<T extends UserConfig>(config: T): T {
+  return config;
 }
 
 /**

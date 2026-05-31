@@ -55,6 +55,9 @@ pnpm install
 
 - `modulo detect`：检测当前项目的 UI 库（vue/react/lit）与版本，并校验是否满足脚手架支持范围
 - `modulo env`：输出环境信息（node/platform/arch）
+- `modulo config`：进入配置文件交互菜单（check / init）
+- `modulo config check`：检查当前项目是否存在 `modulo.config.ts`
+- `modulo config init`：创建默认 `modulo.config.ts`（若已存在会在交互终端询问是否覆盖，可使用 `--force` 强制覆盖）
 - `modulo dev` / `modulo build`：占位命令（当前会先执行 detect，然后结束）
 - `modulo init`：占位命令
 
