@@ -28,6 +28,11 @@ CLI 功能汇总包。
 - 输入 `0` 退出
 - 每次命令执行完提示按回车继续，再返回菜单
 
+## 架构
+
+- `@yannick-z/modulo-cli-options`：提供菜单配置与业务实现（detect/env/config 等）
+- `@yannick-z/modulo-cli-framework`：提供通用 CLI 框架（交互循环、输入解析、子命令分发、Ctrl-C 正常退出等）
+
 ## 结构
 
-- `index.ts`：对外唯一入口，汇总导出 builder / helper / common 的能力，并提供 CLI 入口函数
+- `index.ts`：对外唯一入口，汇总导出 builder / common / cli-options 的能力，并通过 cli-framework 驱动 CLI

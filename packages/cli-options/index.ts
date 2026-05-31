@@ -1,13 +1,12 @@
 /**
- * CLI 的“非打包”能力集合。
+ * modulo 的菜单配置与业务实现（业务相关）。
  *
- * 该包用于承载与构建无关但又属于脚手架范畴的通用能力，例如：
- * - 环境检测
- * - 项目初始化（后续会逐步实现）
- * - 交互/非交互式的参数准备与校验
+ * 该包只负责提供“菜单定义 + 对应业务函数”，不负责 CLI 的通用运行时行为；
+ * CLI 运行时由 `@yannick-z/modulo-cli-framework` 统一承载。
  */
-
 import { isRecord } from '@yannick-z/modulo-common';
+
+export { moduloCliOptions } from './menus/modulo.ts';
 
 export {
   type EnvironmentInfo,
@@ -16,7 +15,6 @@ export {
   getEnvironmentInfo,
   MIN_NODE_MAJOR_VERSION,
 } from './mods/node-env.ts';
-
 export {
   detectUiLibraries,
   type SupportedUiLibrary,
@@ -32,9 +30,6 @@ export interface InitProjectOptions {
   template: string;
 }
 
-/**
- * 项目初始化入口（占位）。
- */
 export async function initProject(options: InitProjectOptions): Promise<void> {
   if (!isRecord(options) || typeof options.name !== 'string' || typeof options.template !== 'string') {
     throw new Error('Invalid init project options.');

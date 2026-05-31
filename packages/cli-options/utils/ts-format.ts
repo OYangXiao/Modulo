@@ -15,10 +15,6 @@ function escapeString(value: string): string {
 /**
  * 将 JS 值格式化为可写入 TS 文件的字面量表达式（用于生成配置文件）。
  *
- * 目标：
- * - 输出稳定、可读的对象字面量
- * - 避免引入额外格式化依赖
- *
  * 限制：
  * - 仅覆盖 JSON 兼容值 + undefined（对象/数组/字符串/数字/布尔/null/undefined）
  * - 不支持函数、Symbol、BigInt、Date、Map/Set 等复杂类型

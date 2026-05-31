@@ -1,18 +1,15 @@
 {
-  "name": "@yannick-z/modulo",
+  "name": "@yannick-z/modulo-cli-options",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "exports": {
     ".": "./index.ts"
   },
-  "bin": {
-    "modulo": "./bin/modulo.ts"
-  },
   "dependencies": {
     "@yannick-z/modulo-builder": "workspace:*",
-    "@yannick-z/modulo-cli-options": "workspace:*",
     "@yannick-z/modulo-cli-framework": "workspace:*",
-    "@yannick-z/modulo-common": "workspace:*"
+    "@yannick-z/modulo-common": "workspace:*",
+    "semver": "^7.7.2"
   }
 }

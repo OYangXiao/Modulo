@@ -1,7 +1,7 @@
 /**
  * modulo CLI 功能汇总入口。
  *
- * 该包负责将 builder（构建能力）与 helper（脚手架能力）组合为对外的统一入口。
+ * 该包负责将 builder（构建能力）与 CLI（菜单配置 + 通用框架）组合为对外的统一入口。
  * 目前仅搭建对外 API 形态，具体 CLI 命令与参数体系后续逐步实现。
  */
 
@@ -9,6 +9,24 @@ import type { UserConfig } from '@yannick-z/modulo-common';
 
 export type { Builder, BuilderCommand, BuilderContext } from '@yannick-z/modulo-builder';
 export { createBuilder } from '@yannick-z/modulo-builder';
+export type {
+  EnvironmentInfo,
+  InitProjectOptions,
+  SupportedUiLibrary,
+  UiLibraryDetectionErrorCode,
+  UiLibraryName,
+  UiLibraryReport,
+  UiLibraryReportItem,
+} from '@yannick-z/modulo-cli-options';
+export {
+  detectUiLibraries,
+  ensureMinNodeMajorVersion,
+  ensureNode24Plus,
+  getEnvironmentInfo,
+  initProject,
+  MIN_NODE_MAJOR_VERSION,
+  UiLibraryDetectionError,
+} from '@yannick-z/modulo-cli-options';
 export type {
   AliasConfig,
   DevServerConfig,
@@ -21,24 +39,6 @@ export type {
   UserConfig,
 } from '@yannick-z/modulo-common';
 export { assertNever, createDefaultUserConfig, isRecord, noop } from '@yannick-z/modulo-common';
-export type {
-  EnvironmentInfo,
-  InitProjectOptions,
-  SupportedUiLibrary,
-  UiLibraryDetectionErrorCode,
-  UiLibraryName,
-  UiLibraryReport,
-  UiLibraryReportItem,
-} from '@yannick-z/modulo-helper';
-export {
-  detectUiLibraries,
-  ensureMinNodeMajorVersion,
-  ensureNode24Plus,
-  getEnvironmentInfo,
-  initProject,
-  MIN_NODE_MAJOR_VERSION,
-  UiLibraryDetectionError,
-} from '@yannick-z/modulo-helper';
 
 export interface ModuloCliOptions {
   cwd?: string;
@@ -56,6 +56,21 @@ export function defineConfig<T extends UserConfig>(config: T): T {
  * CLI 入口（占位）。
  */
 export async function runModuloCli(options: ModuloCliOptions = {}): Promise<void> {
-  const { runCli } = await import('./cli.ts');
-  await runCli({ cwd: options.cwd, argv: options.argv });
+  const [{ createCliMenu }, { moduloCliOptions }] = await Promise.all([
+    import('@yannick-z/modulo-cli-framework'),
+    import('@yannick-z/modulo-cli-options'),
+  ]);
+
+  const readVersion = async (): Promise<string | null> => {
+    try {
+      const pkgPath = new URL('./package.json', import.meta.url);
+      const raw = await (await import('node:fs/promises')).readFile(pkgPath, 'utf8');
+      const json = JSON.parse(raw) as { version?: string };
+      return typeof json.version === 'string' ? json.version : null;
+    } catch {
+      return null;
+    }
+  };
+
+  await createCliMenu(moduloCliOptions, { cwd: options.cwd, argv: options.argv, readVersion });
 }

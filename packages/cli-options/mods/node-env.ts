@@ -1,4 +1,3 @@
-
 export interface EnvironmentInfo {
   nodeVersion: string;
   platform: NodeJS.Platform;

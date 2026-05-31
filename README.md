@@ -21,18 +21,20 @@
 ├── packages/
 │   ├── modulo/   # CLI 功能汇总入口（对外统一入口）
 │   ├── builder/  # build / dev-server 能力
-│   ├── helper/   # 项目初始化、环境检测等非打包能力
+│   ├── cli-framework/ # 通用 CLI 框架（业务无关）
+│   ├── cli-options/   # modulo 的菜单配置与业务实现（业务相关）
 │   └── common/   # 通用函数与类型
 ├── example/      # 用于验证 CLI/检测逻辑的示例项目集合
 ├── bak/          # 历史实现备份（仅供按需参考）
 └── README.md           # 本文档
 ```
 
-- **`packages/modulo`**: CLI 汇总包（`@yannick-z/modulo`），负责组合 builder 与 helper，并作为对外统一入口。
+- **`packages/modulo`**: 对外统一入口（`@yannick-z/modulo`），负责组合 builder + cli-framework + cli-options，并提供 `modulo` 命令。
 - **`packages/builder`**: build / dev-server 能力包（`@yannick-z/modulo-builder`），后续会承载多框架适配实现。
-- **`packages/helper`**: 脚手架辅助能力（`@yannick-z/modulo-helper`），包含环境检测与依赖检测等。
+- **`packages/cli-framework`**: 通用 CLI 框架（`@yannick-z/modulo-cli-framework`），负责交互菜单、输入解析、子菜单、Ctrl-C 正常退出等通用行为。
+- **`packages/cli-options`**: modulo 的菜单配置与业务实现（`@yannick-z/modulo-cli-options`），负责定义菜单结构与各菜单选项的业务函数。
 - **`packages/common`**: 通用函数与类型定义（`@yannick-z/modulo-common`）。
-- **`example`**: 示例项目集合，用于验证 `modulo` CLI 与 `helper` 检测逻辑。
+- **`example`**: 示例项目集合，用于验证 `modulo` CLI 与检测逻辑。
 - **`bak`**: 从历史项目搬运的旧代码备份，当前阶段不作为实现来源，仅在需要时按需参考。
 
 ## 🚀 快速开始
@@ -88,4 +90,4 @@ pnpm -C example/lit2 exec modulo detect
 ### 5. 开发约定
 
 - `packages/modulo` 的 `index.ts` 作为对外唯一入口，负责汇总导出与 CLI 入口定义
-- `packages/builder` / `packages/helper` / `packages/common` 均以 `index.ts` 作为对外入口，保持 API 表面稳定
+- `packages/builder` / `packages/cli-framework` / `packages/cli-options` / `packages/common` 均以 `index.ts` 作为对外入口，保持 API 表面稳定

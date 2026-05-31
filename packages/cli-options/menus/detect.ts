@@ -1,6 +1,7 @@
 import process from 'node:process';
-import { formatOk } from '@yannick-z/modulo-common';
-import { detectUiLibraries } from '@yannick-z/modulo-helper';
+import type { CliRuntimeContext, MenuOption } from '@yannick-z/modulo-cli-framework';
+import { formatOk } from '@yannick-z/modulo-cli-framework';
+import { detectUiLibraries } from '../mods/ui-library.ts';
 
 /**
  * 执行 UI 库检测并输出报告。
@@ -19,4 +20,18 @@ export async function runDetect(cwd: string): Promise<void> {
   if (report.lit) {
     process.stdout.write(`- lit: ${report.lit.installedVersion}\n`);
   }
+}
+
+/**
+ * 一级菜单：detect
+ */
+export function createDetectOption(): MenuOption<CliRuntimeContext> {
+  return {
+    input: '1',
+    name: 'detect',
+    desc: '检测 UI 库与版本',
+    async func(ctx) {
+      await runDetect(ctx.context.cwd);
+    },
+  };
 }

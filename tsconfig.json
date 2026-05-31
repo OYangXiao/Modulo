@@ -9,11 +9,14 @@
       "@yannick-z/modulo-common": [
         "packages/common/index.ts"
       ],
-      "@yannick-z/modulo-helper": [
-        "packages/helper/index.ts"
-      ],
       "@yannick-z/modulo-builder": [
         "packages/builder/index.ts"
+      ],
+      "@yannick-z/modulo-cli-framework": [
+        "packages/cli-framework/index.ts"
+      ],
+      "@yannick-z/modulo-cli-options": [
+        "packages/cli-options/index.ts"
       ],
       "@yannick-z/modulo": [
         "packages/modulo/index.ts"

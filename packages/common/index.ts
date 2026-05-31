@@ -2,7 +2,7 @@
  * 通用工具函数与类型定义。
  *
  * 该包不包含任何构建或 CLI 逻辑，仅提供可复用的最小单元能力，
- * 供 builder / helper / modulo 等包组合使用。
+ * 供 builder / cli-framework / cli-options / modulo 等包组合使用。
  */
 
 export type MaybePromise<T> = T | Promise<T>;
@@ -38,7 +38,5 @@ export {
   type UrlConfig,
   type UserConfig,
 } from './modulo-config.ts';
-
-export { formatError, formatOk, formatTitle, formatWarn, hr } from './utils/cli-format.ts';
 
 export { fileExists, findNearestFileUp, readJsonFile } from './utils/fs.ts';

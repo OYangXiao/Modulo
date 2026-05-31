@@ -1,5 +1,5 @@
 {
-  "name": "@yannick-z/modulo-helper",
+  "name": "@yannick-z/modulo-cli-framework",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,6 @@
     ".": "./index.ts"
   },
   "dependencies": {
-    "@yannick-z/modulo-common": "workspace:*",
-    "semver": "^7.7.2"
+    "picocolors": "^1.1.1"
   }
 }
