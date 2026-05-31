@@ -5,14 +5,28 @@
  * 目前仅搭建对外 API 形态，具体 CLI 命令与参数体系后续逐步实现。
  */
 
-export { createBuilder } from '@modulo/builder';
-export type { Builder, BuilderCommand, BuilderContext } from '@modulo/builder';
-
-export { ensureMinNodeMajorVersion, getEnvironmentInfo, initProject } from '@modulo/helper';
-export type { EnvironmentInfo, InitProjectOptions } from '@modulo/helper';
-
-export type { MaybePromise } from '@modulo/common';
-export { assertNever, isRecord, noop } from '@modulo/common';
+export type { Builder, BuilderCommand, BuilderContext } from '@yannick-z/modulo-builder';
+export { createBuilder } from '@yannick-z/modulo-builder';
+export type { MaybePromise } from '@yannick-z/modulo-common';
+export { assertNever, isRecord, noop } from '@yannick-z/modulo-common';
+export type {
+  EnvironmentInfo,
+  InitProjectOptions,
+  SupportedUiLibrary,
+  UiLibraryDetectionErrorCode,
+  UiLibraryName,
+  UiLibraryReport,
+  UiLibraryReportItem,
+} from '@yannick-z/modulo-helper';
+export {
+  detectUiLibraries,
+  ensureMinNodeMajorVersion,
+  ensureNode24Plus,
+  getEnvironmentInfo,
+  initProject,
+  MIN_NODE_MAJOR_VERSION,
+  UiLibraryDetectionError,
+} from '@yannick-z/modulo-helper';
 
 export interface ModuloCliOptions {
   cwd?: string;
@@ -23,5 +37,6 @@ export interface ModuloCliOptions {
  * CLI 入口（占位）。
  */
 export async function runModuloCli(options: ModuloCliOptions = {}): Promise<void> {
-  void options;
+  const { runCli } = await import('./cli.ts');
+  await runCli({ cwd: options.cwd, argv: options.argv });
 }

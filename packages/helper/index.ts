@@ -7,35 +7,25 @@
  * - 交互/非交互式的参数准备与校验
  */
 
-import { isRecord } from '@modulo/common';
+import { isRecord } from '@yannick-z/modulo-common';
 
-export interface EnvironmentInfo {
-  nodeVersion: string;
-  platform: NodeJS.Platform;
-  arch: string;
-}
+export {
+  type EnvironmentInfo,
+  ensureMinNodeMajorVersion,
+  ensureNode24Plus,
+  getEnvironmentInfo,
+  MIN_NODE_MAJOR_VERSION,
+} from './mods/node-env.ts';
 
-/**
- * 获取当前运行环境的基础信息。
- */
-export function getEnvironmentInfo(): EnvironmentInfo {
-  return {
-    nodeVersion: process.version,
-    platform: process.platform,
-    arch: process.arch,
-  };
-}
-
-/**
- * 简单的 Node 主版本检测。
- */
-export function ensureMinNodeMajorVersion(minMajor: number): void {
-  const match = process.version.match(/^v(\d+)\./);
-  const major = match ? Number(match[1]) : NaN;
-  if (!Number.isFinite(major) || major < minMajor) {
-    throw new Error(`Node.js version ${process.version} is not supported. Require >= v${minMajor}.x`);
-  }
-}
+export {
+  detectUiLibraries,
+  type SupportedUiLibrary,
+  UiLibraryDetectionError,
+  type UiLibraryDetectionErrorCode,
+  type UiLibraryName,
+  type UiLibraryReport,
+  type UiLibraryReportItem,
+} from './mods/ui-library.ts';
 
 export interface InitProjectOptions {
   name: string;

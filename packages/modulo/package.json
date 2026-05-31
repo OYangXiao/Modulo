@@ -1,14 +1,19 @@
 {
-  "name": "@modulo/modulo",
+  "name": "@yannick-z/modulo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "exports": {
     ".": "./index.ts"
   },
+  "bin": {
+    "modulo": "./bin/modulo.ts"
+  },
   "dependencies": {
-    "@modulo/builder": "workspace:*",
-    "@modulo/common": "workspace:*",
-    "@modulo/helper": "workspace:*"
+    "@yannick-z/modulo-builder": "workspace:*",
+    "@yannick-z/modulo-common": "workspace:*",
+    "@yannick-z/modulo-helper": "workspace:*",
+    "cac": "^6.7.14",
+    "picocolors": "^1.1.1"
   }
 }

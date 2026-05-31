@@ -1,0 +1,8 @@
+{
+  "name": "example-no-ui",
+  "private": true,
+  "version": "0.0.0",
+  "devDependencies": {
+    "@yannick-z/modulo": "workspace:*"
+  }
+}

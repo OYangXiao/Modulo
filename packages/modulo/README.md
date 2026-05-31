@@ -1,4 +1,4 @@
-# @modulo/modulo
+# @yannick-z/modulo
 
 CLI 功能汇总包。
 
@@ -9,4 +9,3 @@ CLI 功能汇总包。
 ## 结构
 
 - `index.ts`：对外唯一入口，汇总导出 builder / helper / common 的能力，并提供 CLI 入口函数
-

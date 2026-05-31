@@ -1,0 +1,11 @@
+{
+  "name": "example-vue2-old",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "vue": "2.6.14"
+  },
+  "devDependencies": {
+    "@yannick-z/modulo": "workspace:*"
+  }
+}

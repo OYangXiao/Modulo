@@ -6,16 +6,16 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@modulo/common": [
+      "@yannick-z/modulo-common": [
         "packages/common/index.ts"
       ],
-      "@modulo/helper": [
+      "@yannick-z/modulo-helper": [
         "packages/helper/index.ts"
       ],
-      "@modulo/builder": [
+      "@yannick-z/modulo-builder": [
         "packages/builder/index.ts"
       ],
-      "@modulo/modulo": [
+      "@yannick-z/modulo": [
         "packages/modulo/index.ts"
       ]
     }

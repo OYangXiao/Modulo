@@ -1,0 +1,11 @@
+{
+  "name": "example-lit2",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "lit": "2.8.0"
+  },
+  "devDependencies": {
+    "@yannick-z/modulo": "workspace:*"
+  }
+}

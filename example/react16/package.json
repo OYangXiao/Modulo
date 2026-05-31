@@ -1,0 +1,11 @@
+{
+  "name": "example-react16",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "react": "16.14.0"
+  },
+  "devDependencies": {
+    "@yannick-z/modulo": "workspace:*"
+  }
+}

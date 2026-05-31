@@ -1,5 +1,5 @@
 {
-  "name": "@modulo/builder",
+  "name": "@yannick-z/modulo-builder",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,6 +7,6 @@
     ".": "./index.ts"
   },
   "dependencies": {
-    "@modulo/common": "workspace:*"
+    "@yannick-z/modulo-common": "workspace:*"
   }
 }

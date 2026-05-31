@@ -1,4 +1,4 @@
-# @modulo/builder
+# @yannick-z/modulo-builder
 
 构建与开发服务器能力包。
 
@@ -11,4 +11,3 @@
 ## 入口
 
 - `index.ts`：统一导出对外 API
-
