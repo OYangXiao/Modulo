@@ -72,7 +72,9 @@ function getDeclaredRange(pkg: PackageJson, depName: string): string | undefined
 /**
  * 从 node_modules 中解析某个包的已安装版本。
  *
- * 使用 Node 的模块解析机制，以 cwd 作为查找起点，兼容 monorepo/多层 node_modules。
+ * 为了保证“检测当前项目”的结果稳定且不串包，这里只读取当前项目目录下的直接依赖：
+ * - <projectRoot>/node_modules/<packageName>/package.json
+ *
  * 若未安装或无法读取版本则返回 null。
  */
 async function getInstalledPackageVersion(
@@ -92,6 +94,11 @@ export type UiLibraryName = 'vue' | 'react' | 'lit';
 
 export type UiLibraryDetectionErrorCode = 'NO_UI_LIBRARY' | 'UNSUPPORTED_VERSION' | 'DECLARED_BUT_NOT_INSTALLED';
 
+/**
+ * UI 库检测失败时抛出的错误类型。
+ *
+ * code 用于在 CLI 层进行结构化处理与输出。
+ */
 export class UiLibraryDetectionError extends Error {
   code: UiLibraryDetectionErrorCode;
 

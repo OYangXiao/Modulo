@@ -5,6 +5,9 @@ export interface EnvironmentInfo {
   arch: string;
 }
 
+/**
+ * 该仓库默认要求的 Node 主版本号。
+ */
 export const MIN_NODE_MAJOR_VERSION = 24;
 
 /**
