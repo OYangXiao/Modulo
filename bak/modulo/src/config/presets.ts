@@ -19,6 +19,7 @@ export const preset_input_dirs = {
 	src: "src", // 源码目录
 	pages: "pages", // 页面目录
 	modules: "modules", // 组件目录
+	entries: {} as Record<string, string>, // 单独指定的入口文件配置
 };
 
 export const preset_output_dirs = {
