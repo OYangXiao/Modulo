@@ -11,7 +11,7 @@ export function hr(): string {
  * 标题样式。
  */
 export function formatTitle(title: string): string {
-  return pc.bold(title);
+  return `\n${pc.bold(title)}`;
 }
 
 /**

@@ -95,8 +95,7 @@ function formatMenuLine(option: MenuOption<unknown>): string {
 }
 
 function formatTitlePath(titlePath: string[]): string {
-  const prefix = titlePath.length > 1 ? '\n' : '';
-  return `${prefix}${formatTitle(titlePath.join(' -> '))}`;
+  return `${formatTitle(titlePath.join(' -> '))}`;
 }
 
 function renderMenu<TContext>(menu: MenuDefinition<TContext>, titlePath: string[]): void {
