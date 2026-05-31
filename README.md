@@ -1,30 +1,37 @@
 # Modulo Monorepo
 
-本项目是一个基于 pnpm-workspace 的 monorepo，其核心是 `modulo`，一个现代、高性能的通用前端项目打包工具。
+本项目是一个基于 pnpm-workspace 的 monorepo，其目标是打造一个面向多框架的综合构建脚手架。
 
 ## 👋 简介
 
-`modulo` 旨在提供一种极速、配置简单且功能强大的前端构建方案。它利用了 Rust 工具链的性能优势，并提供了自动入口发现、强大的外部依赖管理和对主流框架（如 React 和 Vue）的内置支持。
+`modulo` 旨在提供一套统一的构建与开发体验，覆盖以下目标框架版本：
 
-本仓库不仅包含了 `modulo` 工具的源代码，还提供了一系列示例项目，以展示如何将其应用于实际开发中。
+- Vue 2.7.16
+- React 17.0.2
+- Vue 3 最新版
+- React 最新版
+- Lit 最新版
+
+目前仓库处于重构阶段：先完成包结构与对外入口约定，再逐步补齐构建器实现与各框架适配。
 
 ## 📂 仓库结构
 
 ```
 /
 ├── packages/
-│   ├── modulo/         # 核心打包工具
-│   ├── react-17.0.2/   # React 示例项目
-│   ├── vue-2.7.16/     # Vue 示例项目
-│   ├── webhost/        # 模块加载宿主库，提供 React 和 Vue 模块的加载和挂载功能
-│   └── ...             # 其他辅助包和示例
+│   ├── modulo/   # CLI 功能汇总入口（对外统一入口）
+│   ├── builder/  # build / dev-server 能力
+│   ├── helper/   # 项目初始化、环境检测等非打包能力
+│   └── common/   # 通用函数与类型
+├── bak/          # 历史实现备份（仅供按需参考）
 └── README.md           # 本文档
 ```
 
-- **`packages/modulo`**: `modulo` CLI 工具的核心代码。如果您想了解其工作原理或为其贡献代码，这里是您的起点。
-- **`packages/react-17.0.2`**: 一个使用 `modulo` 构建的 React 17 示例应用。
-- **`packages/vue-2.7.16`**: 一个使用 `modulo` 构建的 Vue 2.7 示例应用。
-- **`packages/webhost`**: 模块加载宿主库，提供 React 和 Vue 模块的加载和挂载功能，并通过 `window.webhost.remote_module` 暴露 API。
+- **`packages/modulo`**: CLI 汇总包，负责组合 builder 与 helper，并作为对外统一入口。
+- **`packages/builder`**: build / dev-server 能力包，后续会承载多框架适配实现。
+- **`packages/helper`**: 脚手架辅助能力（初始化、环境检测等）。
+- **`packages/common`**: 通用函数与类型定义。
+- **`bak`**: 从历史项目搬运的旧代码备份，当前阶段不作为实现来源，仅在需要时按需参考。
 
 ## 🚀 快速开始
 
@@ -36,29 +43,7 @@
 pnpm install
 ```
 
-### 2. 探索示例项目
+### 2. 开发约定
 
-我们强烈建议您从示例项目开始，以了解 `modulo` 的实际用法。
-
-- **运行 React 示例**:
-
-  ```bash
-  cd packages/react-17.0.2
-  pnpm run dev:page
-  ```
-
-- **运行 Vue 示例**:
-
-  ```bash
-  cd packages/vue-2.7.16
-  pnpm run dev:page
-  ```
-
-- **参考 `webhost` 用法**: `packages/vanilla` 项目提供了 `webhost` 库的调用示例，展示了如何加载和挂载 React 和 Vue 模块。
-- **live-preview**: 使用 vscode 的 live-preview 功能，可以实时预览示例项目的运行效果。目前 vue 和 react 两个项目的配置都按照此路径配置了公共路径。
-
-每个示例项目的 `README.md` 文件都包含了更详细的说明。
-
-### 3. 使用 `modulo`
-
-`modulo` 工具的详细文档位于其包内。请参阅 [**`packages/modulo/README.md`**](./packages/modulo/README.md) 以获取关于其命令行接口、配置文件和核心功能的完整指南。
+- `packages/modulo` 的 `index.ts` 作为对外唯一入口，负责汇总导出与 CLI 入口定义
+- `packages/builder` / `packages/helper` / `packages/common` 均以 `index.ts` 作为对外入口，保持 API 表面稳定

@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@modulo/common": [
+        "packages/common/index.ts"
+      ],
+      "@modulo/helper": [
+        "packages/helper/index.ts"
+      ],
+      "@modulo/builder": [
+        "packages/builder/index.ts"
+      ],
+      "@modulo/modulo": [
+        "packages/modulo/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "packages/**/*"
+  ]
+}
