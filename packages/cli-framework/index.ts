@@ -1,6 +1,7 @@
 import path from 'node:path';
 import process from 'node:process';
 import { createInterface } from 'node:readline/promises';
+import { cac } from 'cac';
 import pc from 'picocolors';
 import { formatError, formatTitle, hr } from './utils/cli-format.ts';
 
@@ -235,39 +236,6 @@ export type CreateCliMenuOptions = {
   readVersion?: () => Promise<string | null>;
 };
 
-function parseGlobalArgs(argv: string[]): { cwd?: string; help: boolean; version: boolean; rest: string[] } {
-  const rest: string[] = [];
-  let cwd: string | undefined;
-  let help = false;
-  let version = false;
-
-  for (let i = 0; i < argv.length; i += 1) {
-    const a = argv[i];
-    if (a === '-C' || a === '--cwd') {
-      const next = argv[i + 1];
-      if (typeof next === 'string') {
-        cwd = next;
-        i += 1;
-      }
-      continue;
-    }
-    if (a === '-h' || a === '--help') {
-      help = true;
-      continue;
-    }
-    if (a === '-v' || a === '--version') {
-      version = true;
-      continue;
-    }
-    if (a.startsWith('-')) {
-      continue;
-    }
-    rest.push(a);
-  }
-
-  return { cwd, help, version, rest };
-}
-
 function renderHelp(menu: MenuDefinition<unknown>): void {
   process.stdout.write(`${formatTitle(menu.title)}\n${hr()}\n`);
   for (const opt of menu.options) {
@@ -289,124 +257,142 @@ export async function createCliMenu(
   options: CreateCliMenuOptions = {},
 ): Promise<void> {
   const argv = options.argv ?? process.argv;
-  const parsed = parseGlobalArgs(argv.slice(2));
-  const cwd = pathResolveCwd(options.cwd, parsed.cwd);
+  const cli = cac(menu.title);
+  cli.option('-C, --cwd <path>', '设置工作目录');
+  cli.option('-h, --help', '输出帮助信息');
+  cli.option('-v, --version', '输出版本号');
+  const main = cli.command('[...rest]');
+  main.allowUnknownOptions();
 
-  if (parsed.version) {
+  main.action(async (restArg?: unknown) => {
+    const rest = Array.isArray(restArg)
+      ? (restArg as unknown[]).map((v) => String(v))
+      : typeof restArg === 'string'
+        ? [restArg]
+        : [];
+
+    const cwd = pathResolveCwd(
+      options.cwd,
+      typeof cli.options.cwd === 'string' ? (cli.options.cwd as string) : undefined,
+    );
+
+    if (rest.length === 0) {
+      if (!process.stdin.isTTY || !process.stdout.isTTY) {
+        process.stderr.write(`${formatError('ERROR')} 未提供命令且当前不是交互终端\n`);
+        process.stderr.write(`请使用：${menu.title} <command>\n`);
+        process.exitCode = 1;
+        return;
+      }
+      await runMenu(menu, { context: { cwd, argv } });
+      return;
+    }
+
+    const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY);
+    let rl: ReturnType<typeof createInterface> | undefined;
+    let interrupted = false;
+
+    const onSigint = () => {
+      interrupted = true;
+      process.stdout.write('\n');
+      rl?.close();
+    };
+    process.on('SIGINT', onSigint);
+
+    const ctx: MenuContext<CliRuntimeContext> = {
+      context: { cwd, argv },
+      print(text) {
+        process.stdout.write(text);
+      },
+      error(text) {
+        process.stderr.write(text);
+      },
+      async question(text) {
+        if (!interactive) throw new Error('当前不是交互终端，无法提问。');
+        rl ??= createInterface({ input: process.stdin, output: process.stdout });
+        return await rl.question(text);
+      },
+      async openMenu(next) {
+        if (!interactive) {
+          process.stderr.write(`${formatError('ERROR')} 当前不是交互终端，无法进入子菜单\n`);
+          process.exitCode = 1;
+          return;
+        }
+        await runMenu(next, { context: { cwd, argv }, titlePath: [menu.title, next.title] });
+      },
+      exit() {},
+      back() {},
+    };
+
+    try {
+      let current: MenuDefinition<CliRuntimeContext> = menu;
+      let option: MenuOption<CliRuntimeContext> | null = null;
+
+      for (let i = 0; i < rest.length; i += 1) {
+        const token = rest[i]!;
+        option = findOptionByName(current, token);
+        if (!option) {
+          process.stderr.write(`${formatError('ERROR')} 未知命令：${token}\n`);
+          renderHelp(current as unknown as MenuDefinition<unknown>);
+          process.exitCode = 1;
+          return;
+        }
+
+        const isLast = i === rest.length - 1;
+        if (!isLast) {
+          if (!option.options) {
+            process.stderr.write(`${formatError('ERROR')} 命令不支持子操作：${token}\n`);
+            process.exitCode = 1;
+            return;
+          }
+          current = { title: option.name, options: option.options };
+          continue;
+        }
+
+        if (option.options && !option.func) {
+          await ctx.openMenu({ title: option.name, options: option.options });
+          return;
+        }
+
+        if (!option.func) {
+          process.stderr.write(`${formatError('ERROR')} 命令不可执行：${token}\n`);
+          process.exitCode = 1;
+          return;
+        }
+
+        await option.func(ctx);
+        return;
+      }
+    } catch (error) {
+      if (interrupted || isAbortError(error)) return;
+      const message = error instanceof Error ? error.message : String(error);
+      process.stderr.write(`${formatError('ERROR')} ${message}\n`);
+      process.exitCode = 1;
+    } finally {
+      process.off('SIGINT', onSigint);
+      if (rl) await rl.close();
+    }
+  });
+
+  cli.parse(argv, { run: false });
+
+  if (cli.options.version) {
     const version = (await options.readVersion?.()) ?? '0.0.0';
     process.stdout.write(`${version}\n`);
     return;
   }
 
-  if (parsed.help) {
-    renderHelp(menu as MenuDefinition<unknown>);
+  if (cli.options.help) {
+    renderHelp(menu as unknown as MenuDefinition<unknown>);
     return;
   }
-
-  if (parsed.rest.length === 0) {
-    if (!process.stdin.isTTY || !process.stdout.isTTY) {
-      process.stderr.write(`${formatError('ERROR')} 未提供命令且当前不是交互终端\n`);
-      process.stderr.write(`请使用：${menu.title} <command>\n`);
-      process.exitCode = 1;
-      return;
-    }
-    await runMenu(menu, { context: { cwd, argv } });
-    return;
-  }
-
-  const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY);
-  let rl: ReturnType<typeof createInterface> | undefined;
-  let interrupted = false;
-
-  const onSigint = () => {
-    interrupted = true;
-    process.stdout.write('\n');
-    rl?.close();
-  };
-  process.on('SIGINT', onSigint);
-
-  const ctx: MenuContext<CliRuntimeContext> = {
-    context: { cwd, argv },
-    print(text) {
-      process.stdout.write(text);
-    },
-    error(text) {
-      process.stderr.write(text);
-    },
-    async question(text) {
-      if (!interactive) throw new Error('当前不是交互终端，无法提问。');
-      rl ??= createInterface({ input: process.stdin, output: process.stdout });
-      try {
-        return await rl.question(text);
-      } catch (error) {
-        if (interrupted || isAbortError(error)) throw error;
-        throw error;
-      }
-    },
-    async openMenu(next) {
-      if (!interactive) {
-        process.stderr.write(`${pc.red('ERROR')} 当前不是交互终端，无法进入子菜单\n`);
-        process.exitCode = 1;
-        return;
-      }
-      await runMenu(next, { context: { cwd, argv }, titlePath: [menu.title, next.title] });
-    },
-    exit() {},
-    back() {},
-  };
 
   try {
-    let current: MenuDefinition<CliRuntimeContext> = menu;
-    let option: MenuOption<CliRuntimeContext> | null = null;
-
-    for (let i = 0; i < parsed.rest.length; i += 1) {
-      const token = parsed.rest[i]!;
-      option = findOptionByName(current, token);
-      if (!option) {
-        process.stderr.write(`${formatError('ERROR')} 未知命令：${token}\n`);
-        renderHelp(current as unknown as MenuDefinition<unknown>);
-        process.exitCode = 1;
-        return;
-      }
-
-      const isLast = i === parsed.rest.length - 1;
-      if (!isLast) {
-        if (!option.options) {
-          process.stderr.write(`${formatError('ERROR')} 命令不支持子操作：${token}\n`);
-          process.exitCode = 1;
-          return;
-        }
-        current = { title: option.name, options: option.options };
-        continue;
-      }
-
-      if (option.options && !option.func) {
-        await ctx.openMenu({ title: option.name, options: option.options });
-        return;
-      }
-
-      if (!option.func) {
-        process.stderr.write(`${formatError('ERROR')} 命令不可执行：${token}\n`);
-        process.exitCode = 1;
-        return;
-      }
-
-      try {
-        await option.func(ctx);
-      } catch (error) {
-        if (interrupted || isAbortError(error)) return;
-        throw error;
-      }
-      return;
-    }
+    await Promise.resolve(cli.runMatchedCommand());
   } catch (error) {
-    if (interrupted || isAbortError(error)) return;
+    if (isAbortError(error)) return;
     const message = error instanceof Error ? error.message : String(error);
     process.stderr.write(`${formatError('ERROR')} ${message}\n`);
     process.exitCode = 1;
-  } finally {
-    process.off('SIGINT', onSigint);
-    if (rl) await rl.close();
   }
 }
 
